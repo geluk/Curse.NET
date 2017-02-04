@@ -14,14 +14,15 @@ namespace Curse.NET
 		private LoginResponse login;
 		private SessionResponse session;
 
-		public event MessageReceivedEvent OnMessageReceived;
+		public event MessageReceivedEvent MessageReceived;
 
 		public IReadOnlyList<Group> Groups { get; private set; }
 		public IReadOnlyList<Friend> Friends { get; private set; }
 		public IReadOnlyDictionary<string, Channel> ChannelMap { get; private set; }
-		public IReadOnlyDictionary<string, User> UserMap { get; private set; }
+		//public IReadOnlyDictionary<string, User> UserMap { get; private set; }
+		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
 
-		public const string Version = "0.1.0";
+		public const string Version = "0.1.1";
 
 		public void Connect(string username, string password)
 		{
@@ -45,7 +46,7 @@ namespace Curse.NET
 			var mcfStaff = Groups.First(g => g.GroupTitle == "Minecraft Forum").Channels.First(c => c.GroupTitle == "staff-offtopic");
 			var messages = mcfStaff.GetMessages(DateTime.MinValue, DateTime.Now, 30);
 			// Forward socket events
-			socketApi.OnMessageReceived += message => OnMessageReceived?.Invoke(message);
+			ForwardEvents();
 
 			session = curseApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
 			socketApi.Connect(new Uri(session.NotificationServiceUrl), login.Session.Token);
@@ -59,7 +60,18 @@ namespace Curse.NET
 			Groups = contacts.Groups;
 			Friends = contacts.Friends;
 
-			ChannelMap = contacts.Groups.SelectMany(g => g.Channels).ToDictionary(c => c.GroupID);
+			ChannelMap = Groups.SelectMany(g => g.Channels).ToDictionary(c => c.GroupID);
+			GroupMap = Groups.ToDictionary(g => g.GroupID);
+		}
+
+		private void ForwardEvents()
+		{
+			socketApi.MessageReceived += message =>
+			{
+				var channel = ChannelMap[message.ConversationID];
+				var group = GroupMap[message.ServerID];
+				MessageReceived?.Invoke(group, channel, message);
+			};
 		}
 
 		/// <summary>
@@ -67,16 +79,20 @@ namespace Curse.NET
 		/// </summary>
 		public Group FindGroup(string name) => Groups.FirstOrDefault(g => g.GroupTitle == name);
 
-		public void SendMessage(Channel clientChannel, string message)
+		public void SendMessage(string channelId, string message)
 		{
-			var rs = curseApi.Post($"https://conversations-v1.curseapp.net/conversations/{clientChannel.GroupID}", new SendMessageRequest
+			var rs = curseApi.Post($"https://conversations-v1.curseapp.net/conversations/{channelId}", new SendMessageRequest
 			{
 				Body = message,
 				// TODO: Verify that SessionID should be used here
 				ClientID = session.SessionID,
 				MachineKey = session.MachineKey
 			});
-			;
+		}
+
+		public void SendMessage(Channel clientChannel, string message)
+		{
+			SendMessage(clientChannel.GroupID, message);
 		}
 	}
 }

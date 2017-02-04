@@ -9,13 +9,12 @@ using Newtonsoft.Json;
 
 namespace Curse.NET
 {
-	public delegate void MessageReceivedEvent(MessageResponse message);
 
 	internal class SocketApi
 	{
 		private readonly ClientWebSocket webSocket= new ClientWebSocket();
 
-		public event MessageReceivedEvent OnMessageReceived;
+		public event SocketMessageReceivedEvent MessageReceived;
 
 		public void Connect(Uri wsUri, string authToken)
 		{
@@ -57,7 +56,7 @@ namespace Curse.NET
 				case ResponseType.ChannelReference:
 					break;
 				case ResponseType.ChatMessage:
-					OnMessageReceived?.Invoke((MessageResponse)message.Body);
+					MessageReceived?.Invoke((MessageResponse)message.Body);
 					break;
 				case ResponseType.Login:
 					break;
