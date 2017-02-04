@@ -1,6 +1,13 @@
 # Curse.NET
 A C#/.NET Curse Client API
 
+## Installation
+
+Install the NuGet package to your project.
+```
+Install-Package Curse.NET
+```
+Alternatively, clone the project, build the DLL, and reference it.
 
 ## Usage
 
