@@ -19,10 +19,11 @@ namespace Curse.NET
 		public IReadOnlyList<Group> Groups { get; private set; }
 		public IReadOnlyList<Friend> Friends { get; private set; }
 		public IReadOnlyDictionary<string, Channel> ChannelMap { get; private set; }
+		// TODO: implement this
 		//public IReadOnlyDictionary<string, User> UserMap { get; private set; }
 		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
 
-		public const string Version = "0.1.1";
+		public const string Version = "0.1.2";
 
 		public void Connect(string username, string password)
 		{
