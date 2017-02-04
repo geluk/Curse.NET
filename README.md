@@ -4,6 +4,7 @@ A C#/.NET Curse Client API
 
 ## Usage
 
+Connecting to Curse:
 ```
 var client = new CurseClient();
 client.OnMessageReceived += (message) => {
