@@ -8,7 +8,7 @@ namespace Curse.NET.SocketModel
 		public int ChangeType { get; set; }
 		public int SenderID { get; set; }
 		public string SenderName { get; set; }
-		public Group Group { get; set; }
+		public GroupChange Group { get; set; }
 		public Member[] Members { get; set; }
 		public DateTime TimeStamp { get; set; }
 		public object[] ChildGroups { get; set; }
@@ -16,7 +16,7 @@ namespace Curse.NET.SocketModel
 		public object MessageToUsers { get; set; }
 	}
 
-	public class Group
+	public class GroupChange
 	{
 		public string GroupTitle { get; set; }
 		public string GroupID { get; set; }
