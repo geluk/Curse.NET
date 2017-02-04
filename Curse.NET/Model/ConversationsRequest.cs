@@ -1,4 +1,7 @@
-﻿namespace Curse.NET.Model
+﻿using System;
+using Newtonsoft.Json;
+
+namespace Curse.NET.Model
 {
 	public class ConversationsRequest : RequestObject
 	{
@@ -13,7 +16,8 @@
 		public string ContactID { get; set; }
 		public int ConversationType { get; set; }
 		public string RootConversationID { get; set; }
-		public long Timestamp { get; set; }
+		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		public DateTime Timestamp { get; set; }
 		public int SenderID { get; set; }
 		public string SenderName { get; set; }
 		public int SenderPermissions { get; set; }
@@ -23,10 +27,12 @@
 		public int RecipientID { get; set; }
 		public string Body { get; set; }
 		public bool IsDeleted { get; set; }
-		public int DeletedTimestamp { get; set; }
+		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		public DateTime DeletedTimestamp { get; set; }
 		public int DeletedUserID { get; set; }
 		public object DeletedUsername { get; set; }
-		public int EditedTimestamp { get; set; }
+		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		public DateTime EditedTimestamp { get; set; }
 		public int EditedUserID { get; set; }
 		public object EditedUsername { get; set; }
 		public int LikeCount { get; set; }
