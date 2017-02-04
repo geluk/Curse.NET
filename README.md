@@ -14,8 +14,7 @@ Alternatively, clone the project, build the DLL, and reference it.
 Connecting to Curse:
 ```csharp
 var client = new CurseClient();
-client.OnMessageReceived += (message) => {
-    var channel = client.ChannelMap[message.ConversationID];
+client.OnMessageReceived += (server, channel, message) => {
     Console.WriteLine($"[{channel.GroupTitle}] {message.SenderName}: {message.Body}")
 }
 client.Connect("username", "password");
