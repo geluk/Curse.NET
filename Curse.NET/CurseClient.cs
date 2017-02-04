@@ -23,7 +23,7 @@ namespace Curse.NET
 		//public IReadOnlyDictionary<string, User> UserMap { get; private set; }
 		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
 
-		public const string Version = "0.1.3";
+		public const string Version = "0.1.4";
 
 		public void Connect(string username, string password)
 		{
