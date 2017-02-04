@@ -70,7 +70,7 @@ namespace Curse.NET
 			socketApi.MessageReceived += message =>
 			{
 				var channel = ChannelMap[message.ConversationID];
-				var group = GroupMap[message.ServerID];
+				var group = GroupMap[message.RootConversationID];
 				MessageReceived?.Invoke(group, channel, message);
 			};
 		}
