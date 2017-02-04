@@ -21,6 +21,8 @@ namespace Curse.NET
 		public IReadOnlyDictionary<string, Channel> ChannelMap { get; private set; }
 		public IReadOnlyDictionary<string, User> UserMap { get; private set; }
 
+		public const string Version = "0.1.0";
+
 		public void Connect(string username, string password)
 		{
 			username = WebUtility.UrlEncode(username);
