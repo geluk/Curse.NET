@@ -5,7 +5,7 @@ A C#/.NET Curse Client API
 ## Usage
 
 Connecting to Curse:
-```
+```csharp
 var client = new CurseClient();
 client.OnMessageReceived += (message) => {
     var channel = client.ChannelMap[message.ConversationID];
