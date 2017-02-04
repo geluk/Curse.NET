@@ -44,8 +44,6 @@ namespace Curse.NET
 			ModelExtensions.Api = curseApi;
 			// Load server list and friends list
 			LoadContacts();
-			var mcfStaff = Groups.First(g => g.GroupTitle == "Minecraft Forum").Channels.First(c => c.GroupTitle == "staff-offtopic");
-			var messages = mcfStaff.GetMessages(DateTime.MinValue, DateTime.Now, 30);
 			// Forward socket events
 			ForwardEvents();
 
