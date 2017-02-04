@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <!-- The identifier that must be unique within the hosting gallery -->
+    <id>Curse.NET</id>
+    <packageTypes>
+        <packageType name="Dependency" />
+    </packageTypes>
+
+    <!-- The package version number that is used when resolving dependencies -->
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>baggykiin</authors>
+    <owners>baggykiin</owners>
+	<licenseUrl>http://github.com/baggykiin/Curse.NET/blob/master/LICENCE</licenseUrl>
+	<projectUrl>http://github.com/baggykiin/Curse.NET/</projectUrl>
+    <!-- <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl> -->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<description>C#/.NET Curse Client API</description>
+    <releaseNotes>First pre-release</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>Curse Client Curse-Client API</tags>
+  </metadata>
+</package>
