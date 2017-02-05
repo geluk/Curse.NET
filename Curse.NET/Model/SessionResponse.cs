@@ -6,12 +6,12 @@ namespace Curse.NET.Model
 	{
 		public string SessionID { get; set; }
 		public string MachineKey { get; set; }
-		public User User { get; set; }
+		public SessionUser User { get; set; }
 		public int[] Platforms { get; set; }
 		public string NotificationServiceUrl { get; set; }
 	}
 
-	public class User
+	public class SessionUser
 	{
 		public int UserID { get; set; }
 		public string Username { get; set; }
