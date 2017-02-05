@@ -16,5 +16,11 @@ namespace Curse.NET.Model
 
 			return rs;
 		}
+
+		public static UserResponse LookupUser(this Group group, int userId)
+		{
+			var rs = Api.Get<UserResponse>($"https://groups-v1.curseapp.net/groups/{group.GroupID}/members/{userId}");
+			return rs;
+		}
 	}
 }
