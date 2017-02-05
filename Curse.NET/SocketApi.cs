@@ -12,9 +12,12 @@ namespace Curse.NET
 
 	internal class SocketApi
 	{
-		private readonly ClientWebSocket webSocket= new ClientWebSocket();
+		private readonly ClientWebSocket webSocket = new ClientWebSocket();
 
 		public event SocketMessageReceivedEvent MessageReceived;
+		public event ChannelMarkedReadEvent ChannelMarkedRead;
+		public event MessageChangedEvent MessageChanged;
+		public event UserActivityChangeEvent UserActivityChange;
 
 		public void Connect(Uri wsUri, string authToken)
 		{
@@ -39,10 +42,17 @@ namespace Curse.NET
 			{
 				while (webSocket.CloseStatus == null)
 				{
-					var message = webSocket.ReceiveMessage().Result;
-					var parsed = SocketResponse.Deserialise(message);
+					try
+					{
+						var message = webSocket.ReceiveMessage().Result;
+						var parsed = SocketResponse.Deserialise(message);
+						ProcessMessage(parsed);
+					}
+					catch (WebSocketException e)
+					{
+						// TODO: handle disconnect
+					}
 
-					ProcessMessage(parsed);
 				}
 			});
 		}
@@ -52,15 +62,23 @@ namespace Curse.NET
 			switch (message.TypeID)
 			{
 				case ResponseType.UserActivityChange:
+					UserActivityChange?.Invoke((UserActivityChangeResponse)message.Body);
 					break;
-				case ResponseType.ChannelReference:
+				case ResponseType.ChannelMarkedRead:
+					ChannelMarkedRead?.Invoke((ChannelMarkedReadResponse)message.Body);
 					break;
 				case ResponseType.ChatMessage:
 					MessageReceived?.Invoke((MessageResponse)message.Body);
 					break;
 				case ResponseType.Login:
 					break;
-				case ResponseType.UnknownChange:
+				case ResponseType.MessageChanged:
+					MessageChanged?.Invoke((MessageChangedResponse)message.Body);
+					break;
+				case ResponseType.ChannelStatusChanged:
+					// TODO: implement ChannelStatusChanged event
+					break;
+				case ResponseType.Unknown1:
 					break;
 				default:
 					break;

@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -59,12 +59,14 @@
     <Compile Include="Model\SendMessageRequest.cs" />
     <Compile Include="Model\SessionRequest.cs" />
     <Compile Include="Model\SessionResponse.cs" />
+    <Compile Include="Model\UserResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SocketApi.cs" />
-    <Compile Include="SocketModel\ChannelReferenceResponse.cs" />
+    <Compile Include="SocketModel\ChannelMarkedReadResponse.cs" />
+    <Compile Include="SocketModel\ChannelStatusChangedResponse.cs" />
     <Compile Include="SocketModel\FriendshipResponse.cs" />
     <Compile Include="SocketModel\LoginRequest.cs" />
-    <Compile Include="SocketModel\LoginResponse.cs" />
+    <Compile Include="SocketModel\SocketLoginResponse.cs" />
     <Compile Include="SocketModel\MessageResponse.cs" />
     <Compile Include="SocketModel\MessageType.cs" />
     <Compile Include="SocketModel\RequestBody.cs" />
@@ -72,7 +74,8 @@
     <Compile Include="SocketEvents.cs" />
     <Compile Include="SocketModel\SocketRequest.cs" />
     <Compile Include="SocketModel\SocketResponse.cs" />
-    <Compile Include="SocketModel\UnknownChangeResponse.cs" />
+    <Compile Include="SocketModel\MessageChangedResponse.cs" />
+    <Compile Include="SocketModel\UserActivityChangeResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

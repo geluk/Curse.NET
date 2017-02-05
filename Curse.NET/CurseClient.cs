@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Curse.NET.Model;
+using Curse.NET.SocketModel;
 
 namespace Curse.NET
 {
@@ -20,7 +21,6 @@ namespace Curse.NET
 		public IReadOnlyList<Friend> Friends { get; private set; }
 		public IReadOnlyDictionary<string, Channel> ChannelMap { get; private set; }
 		// TODO: implement this
-		//public IReadOnlyDictionary<string, User> UserMap { get; private set; }
 		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
 
 		public const string Version = "0.1.4";
@@ -65,12 +65,49 @@ namespace Curse.NET
 
 		private void ForwardEvents()
 		{
-			socketApi.MessageReceived += message =>
+			socketApi.MessageReceived += OnMessageReceived;
+			socketApi.ChannelMarkedRead += OnChannelMarkedRead;
+			socketApi.MessageChanged += OnMessageChanged;
+			socketApi.UserActivityChange += OnUserActivityChange;
+		}
+
+		private void OnUserActivityChange(UserActivityChangeResponse activity)
+		{
+			var group = GroupMap[activity.GroupID];
+			var user = group.LookupUser(activity.Users.First().UserID);
+			// TODO: handle user activity change
+			return;
+		}
+
+		private void OnMessageChanged(MessageChangedResponse change)
+		{
+			switch (change.ChangeType)
 			{
-				var channel = ChannelMap[message.ConversationID];
-				var group = GroupMap[message.RootConversationID];
-				MessageReceived?.Invoke(group, channel, message);
-			};
+				case ChangeType.Deleted:
+					break;
+				case ChangeType.ChannelChange:
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void OnChannelMarkedRead(ChannelMarkedReadResponse channel)
+		{
+			var ch = ChannelMap[channel.ConversationID];
+			;
+		}
+
+		private void OnMessageReceived(MessageResponse message)
+		{
+			var channel = ChannelMap[message.ConversationID];
+			var group = GroupMap[message.RootConversationID];
+			if (message.DeletedUserID != 0 || message.EditedUserID != 0)
+			{
+				;
+			}
+			MessageReceived?.Invoke(@group, channel, message);
+
 		}
 
 		/// <summary>

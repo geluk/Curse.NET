@@ -18,15 +18,21 @@ namespace Curse.NET.SocketModel
 					obj.Body = JsonConvert.DeserializeObject<MessageResponse>(body);
 					break;
 				case ResponseType.Login:
-					obj.Body = JsonConvert.DeserializeObject<LoginResponse>(body);
+					obj.Body = JsonConvert.DeserializeObject<SocketLoginResponse>(body);
 					break;
-				case ResponseType.UnknownChange:
-					obj.Body = JsonConvert.DeserializeObject<UnknownChangeResponse>(body);
+				case ResponseType.MessageChanged:
+					obj.Body = JsonConvert.DeserializeObject<MessageChangedResponse>(body);
 					break;
 				case ResponseType.UserActivityChange:
+					obj.Body = JsonConvert.DeserializeObject<UserActivityChangeResponse>(body);
 					break;
-				case ResponseType.ChannelReference:
-					obj.Body = JsonConvert.DeserializeObject<ChannelReferenceResponse>(body);
+				case ResponseType.ChannelMarkedRead:
+					obj.Body = JsonConvert.DeserializeObject<ChannelMarkedReadResponse>(body);
+					break;
+				case ResponseType.Unknown1:
+					break;
+				case ResponseType.ChannelStatusChanged:
+					obj.Body = JsonConvert.DeserializeObject<ChannelStatusChangedResponse>(body);
 					break;
 				default:
 					break;
