@@ -11,7 +11,7 @@ namespace Curse.NET.SocketModel
 		public string ContactID { get; set; }
 		public int ConversationType { get; set; }
 		public string RootConversationID { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime Timestamp { get; set; }
 		public int SenderID { get; set; }
 		public string SenderName { get; set; }
@@ -26,7 +26,7 @@ namespace Curse.NET.SocketModel
 		public DateTime DeletedTimestamp { get; set; }
 		public int DeletedUserID { get; set; }
 		public object DeletedUsername { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime EditedTimestamp { get; set; }
 		public int EditedUserID { get; set; }
 		public object EditedUsername { get; set; }
