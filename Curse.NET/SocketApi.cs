@@ -48,7 +48,7 @@ namespace Curse.NET
 						var parsed = SocketResponse.Deserialise(message);
 						ProcessMessage(parsed);
 					}
-					catch (WebSocketException e)
+					catch (WebSocketException)
 					{
 						// TODO: handle disconnect
 					}
