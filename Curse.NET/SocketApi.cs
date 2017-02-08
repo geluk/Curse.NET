@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Net;
-using System.Net.WebSockets;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Curse.NET.ExtensionMethods;
 using Curse.NET.SocketModel;
 using Newtonsoft.Json;
+using WebSocketSharp;
+using WebSocketSharp.Net;
 
 namespace Curse.NET
 {
 
 	internal class SocketApi
 	{
-		private readonly ClientWebSocket webSocket = new ClientWebSocket();
+		//private readonly ClientWebSocket webSocket = new ClientWebSocket();
+		private WebSocket webSocket;
 
 		public event SocketMessageReceivedEvent MessageReceived;
 		public event ChannelMarkedReadEvent ChannelMarkedRead;
@@ -21,9 +23,21 @@ namespace Curse.NET
 
 		public void Connect(Uri wsUri, string authToken)
 		{
-			webSocket.Options.SetRequestHeader("Origin", "https://www.curse.com");
-			webSocket.Options.SetRequestHeader("Cookie", "CurseAuthToken=" + WebUtility.UrlEncode(authToken));
-			webSocket.ConnectAsync(wsUri, CancellationToken.None).Wait();
+			webSocket = new WebSocket(wsUri.ToString());
+			webSocket.SetCookie(new Cookie("CurseAuthToken", authToken));
+			webSocket.Origin = "https://www.curse.com";
+			webSocket.OnMessage += MessageHandler;
+			webSocket.Connect();
+
+			//webSocket.Options.SetRequestHeader("Origin", "https://www.curse.com");
+			//webSocket.Options.SetRequestHeader("Cookie", "CurseAuthToken=" + WebUtility.UrlEncode(authToken));
+			//webSocket.ConnectAsync(wsUri, CancellationToken.None).Wait();
+		}
+
+		private void MessageHandler(object sender, MessageEventArgs ev)
+		{
+			var response = SocketResponse.Deserialise(ev.Data);
+			ProcessMessage(response);
 		}
 
 		public void Login(string machineKey, string sessionId, int userId)
@@ -33,28 +47,35 @@ namespace Curse.NET
 
 		public async void SendMessage(SocketRequest message)
 		{
-			await webSocket.SendMessage(JsonConvert.SerializeObject(message));
+			var semaphore = new SemaphoreSlim(0, 1);
+			var messageText = JsonConvert.SerializeObject(message);
+			webSocket.SendAsync(messageText, success =>
+			{
+				semaphore.Release();
+			});
+			await semaphore.WaitAsync();
 		}
 
 		public void Listen()
 		{
-			Task.Run(() =>
-			{
-				while (webSocket.CloseStatus == null)
-				{
-					try
-					{
-						var message = webSocket.ReceiveMessage().Result;
-						var parsed = SocketResponse.Deserialise(message);
-						ProcessMessage(parsed);
-					}
-					catch (WebSocketException)
-					{
-						// TODO: handle disconnect
-					}
+			//Task.Run(() =>
+			//{
+			//	while (webSocket.CloseStatus == null)
+			//	{
+			//		try
+			//		{
+			//			var message = webSocket.ReceiveMessage().Result;
+			//			var parsed = SocketResponse.Deserialise(message);
+			//			ProcessMessage(parsed);
+			//		}
+			//		catch (WebSocketException)
+			//		{
+			//			Debugger.Break();
+			//			// TODO: handle disconnect
+			//		}
 
-				}
-			});
+			//	}
+			//});
 		}
 
 		private void ProcessMessage(SocketResponse message)
