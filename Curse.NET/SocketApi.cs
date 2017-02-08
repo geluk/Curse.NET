@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Curse.NET.ExtensionMethods;
 using Curse.NET.SocketModel;
 using Newtonsoft.Json;
 using WebSocketSharp;
@@ -27,6 +25,7 @@ namespace Curse.NET
 			webSocket.SetCookie(new Cookie("CurseAuthToken", authToken));
 			webSocket.Origin = "https://www.curse.com";
 			webSocket.OnMessage += MessageHandler;
+			webSocket.OnError += SocketErrorHandler;
 			webSocket.Connect();
 
 			//webSocket.Options.SetRequestHeader("Origin", "https://www.curse.com");
@@ -34,10 +33,18 @@ namespace Curse.NET
 			//webSocket.ConnectAsync(wsUri, CancellationToken.None).Wait();
 		}
 
+		private void SocketErrorHandler(object sender, ErrorEventArgs errorEventArgs)
+		{
+			;
+		}
+
 		private void MessageHandler(object sender, MessageEventArgs ev)
 		{
-			var response = SocketResponse.Deserialise(ev.Data);
-			ProcessMessage(response);
+			Task.Run(() =>
+			{
+				var response = SocketResponse.Deserialise(ev.Data);
+				ProcessMessage(response);
+			});
 		}
 
 		public void Login(string machineKey, string sessionId, int userId)
