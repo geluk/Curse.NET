@@ -29,7 +29,7 @@ namespace Curse.NET.SocketModel
 	{
 		public string GroupTitle { get; set; }
 		public string GroupID { get; set; }
-		public int HomeRegionID { get; set; }
+		public RegionId HomeRegionID { get; set; }
 		public string HomeRegionKey { get; set; }
 		public string ParentGroupID { get; set; }
 		public string RootGroupID { get; set; }

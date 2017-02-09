@@ -1,4 +1,5 @@
 ﻿using System;
+using Curse.NET.SocketModel;
 
 namespace Curse.NET.Model
 {
@@ -15,7 +16,7 @@ namespace Curse.NET.Model
 		public int OtherUserID { get; set; }
 		public string OtherUsername { get; set; }
 		public string OtherUserNickname { get; set; }
-		public int OtherUserRegionID { get; set; }
+		public RegionId OtherUserRegionID { get; set; }
 		public int OtherUserConnectionStatus { get; set; }
 		public string InvitationMessage { get; set; }
 		public bool IsFavorite { get; set; }
@@ -47,7 +48,7 @@ namespace Curse.NET.Model
 	{
 		public string GroupTitle { get; set; }
 		public string GroupID { get; set; }
-		public int HomeRegionID { get; set; }
+		public RegionId HomeRegionID { get; set; }
 		public string HomeRegionKey { get; set; }
 		public string ParentGroupID { get; set; }
 		public string RootGroupID { get; set; }
