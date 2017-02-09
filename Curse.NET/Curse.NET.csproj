@@ -80,6 +80,8 @@
     <Compile Include="SocketModel\FriendRemovedResponse.cs" />
     <Compile Include="SocketModel\FriendshipStatusResponse.cs" />
     <Compile Include="SocketModel\LoginRequest.cs" />
+    <Compile Include="SocketModel\PingRequest.cs" />
+    <Compile Include="SocketModel\PingResponse.cs" />
     <Compile Include="SocketModel\RegionId.cs" />
     <Compile Include="SocketModel\ClientPreferencesResponse.cs" />
     <Compile Include="SocketModel\SocketLoginResponse.cs" />

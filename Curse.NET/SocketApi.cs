@@ -39,6 +39,8 @@ namespace Curse.NET
 
 		public event Action SocketClosed;
 
+		private Timer pingTimer;
+
 #if NETSOCKET
 		public void Connect(Uri wsUri, string authToken)
 		{
@@ -65,6 +67,13 @@ namespace Curse.NET
 			webSocket.MessageReceived += MessageHandler;
 			webSocket.Open();
 			semaphore.Wait();
+			pingTimer = new Timer(state =>
+			{
+				if (webSocket.State == WebSocketState.Open)
+				{
+					SendMessage(PingRequest.Create());
+				}
+			}, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
 		}
 
 		private void ErrorHandler(object sender, ErrorEventArgs errorEventArgs)
@@ -196,7 +205,8 @@ namespace Curse.NET
 
 		public void Dispose()
 		{
-			webSocket.Dispose();
+			webSocket?.Dispose();
+			pingTimer?.Dispose();
 		}
 	}
 }

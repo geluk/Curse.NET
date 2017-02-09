@@ -3,10 +3,12 @@
 	public enum RequestType
 	{
 		Login = -2101997347,
+		Ping = -476754606
 	}
 
 	public enum ResponseType
 	{
+		Ping = -476754606,
 		ChannelStatusChanged = 72981382,
 		UserActivityChange = 1260535191,
 		ChannelMarkedRead = -695526586,

@@ -44,6 +44,9 @@ namespace Curse.NET.SocketModel
 				case ResponseType.FriendRemoved:
 					// Sent when a friend request is declined, or when someone removes you as friend
 					break;
+				case ResponseType.Ping:
+					obj.Body = JsonConvert.DeserializeObject<PingResponse>(body);
+					break;
 				default:
 					break;
 			}

@@ -17,6 +17,7 @@ namespace Curse.NET
 
 		public event MessageReceivedEvent MessageReceived;
 		public event Action WebsocketReconnected;
+		public event Action ConnectionLost;
 
 		public bool AutoReconnect { get; set; } = true;
 
@@ -102,6 +103,10 @@ namespace Curse.NET
 			{
 				ConnectSocket();
 				WebsocketReconnected?.Invoke();
+			}
+			else
+			{
+				ConnectionLost?.Invoke();
 			}
 		}
 

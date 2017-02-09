@@ -9,6 +9,7 @@
 		public string MachineKey { get; set; }
 		public int UserID { get; set; }
 		public string SessionID { get; set; }
+		public int Status { get; set; }
 
 		public static SocketRequest Create(string machineKey, string sessionId, int userID)
 		{
@@ -20,7 +21,8 @@
 					ClientVersion = "7.0.140",
 					MachineKey = machineKey,
 					SessionID = sessionId,
-					UserID = userID
+					UserID = userID,
+					Status = 1
 				}
 			};
 		}
