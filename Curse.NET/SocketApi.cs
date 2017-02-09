@@ -208,5 +208,10 @@ namespace Curse.NET
 			webSocket?.Dispose();
 			pingTimer?.Dispose();
 		}
+
+		public void SendRawMessage(string message)
+		{
+			webSocket.Send(message);
+		}
 	}
 }
