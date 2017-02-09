@@ -32,8 +32,8 @@ namespace Curse.NET.SocketModel
 				case ResponseType.Unknown1:
 					// Sent when a message is posted to a channel
 					break;
-				case ResponseType.Unknown2:
-					// Sent during login
+				case ResponseType.ClientPreferences:
+					obj.Body = JsonConvert.DeserializeObject<ClientPreferencesResponse>(body);
 					break;
 				case ResponseType.ChannelStatusChanged:
 					obj.Body = JsonConvert.DeserializeObject<ChannelStatusChangedResponse>(body);

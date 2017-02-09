@@ -12,11 +12,10 @@
 		ChannelMarkedRead = -695526586,
 		ChatMessage = -635182161,
 		Login = -815187584,
+		ClientPreferences = 937250613,
 		MessageChanged = 149631008,
 		Unknown1 = 705131365,
-		Unknown2 = 937250613,
 		FriendshipStatus = 580569888,
 		FriendRemoved = 1216900677,
 	}
 }
-//
