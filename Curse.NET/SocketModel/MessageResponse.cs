@@ -31,8 +31,8 @@ namespace Curse.NET.SocketModel
 		public int EditedUserID { get; set; }
 		public object EditedUsername { get; set; }
 		public int LikeCount { get; set; }
-		public object[] LikeUserIDs { get; set; }
-		public object[] LikeUsernames { get; set; }
+		public int[] LikeUserIDs { get; set; }
+		public string[] LikeUsernames { get; set; }
 		public object[] ContentTags { get; set; }
 		public object[] Attachments { get; set; }
 		public int NotificationType { get; set; }
