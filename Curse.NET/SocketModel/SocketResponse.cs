@@ -30,9 +30,13 @@ namespace Curse.NET.SocketModel
 					obj.Body = JsonConvert.DeserializeObject<ChannelMarkedReadResponse>(body);
 					break;
 				case ResponseType.Unknown1:
+					// might be a name mention?
 					break;
 				case ResponseType.ChannelStatusChanged:
 					obj.Body = JsonConvert.DeserializeObject<ChannelStatusChangedResponse>(body);
+					break;
+				case ResponseType.FriendshipStatus:
+					obj.Body = JsonConvert.DeserializeObject<FriendshipResponse>(body);
 					break;
 				default:
 					break;

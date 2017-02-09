@@ -1,9 +1,10 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Curse.NET.SocketModel
 {
 
-	public class FriendshipResponse
+	public class FriendshipResponse : ResponseBody
 	{
 		public Friendship Friendship { get; set; }
 	}
@@ -29,9 +30,12 @@ namespace Curse.NET.SocketModel
 		public DateTime DateRead { get; set; }
 		public int UnreadCount { get; set; }
 		public int MutualFriendCount { get; set; }
-		public long OtherUserConnectionStatusTimestamp { get; set; }
-		public long RequestedTimestamp { get; set; }
-		public long AvatarTimestamp { get; set; }
+		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		public DateTime OtherUserConnectionStatusTimestamp { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime RequestedTimestamp { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime AvatarTimestamp { get; set; }
 	}
 
 }
