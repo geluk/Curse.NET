@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using Curse.NET.Model;
 using Curse.NET.SocketModel;
 
@@ -10,12 +11,14 @@ namespace Curse.NET
 	public class CurseClient
 	{
 		private readonly CurseApi curseApi = new CurseApi();
-		private readonly SocketApi socketApi = new SocketApi();
-
+		private SocketApi socketApi;
 		private LoginResponse login;
 		private SessionResponse session;
 
 		public event MessageReceivedEvent MessageReceived;
+		public event Action WebsocketReconnected;
+
+		public bool AutoReconnect { get; set; } = true;
 
 		public IReadOnlyList<Group> Groups { get; private set; }
 		public IReadOnlyList<Friend> Friends { get; private set; }
@@ -44,13 +47,33 @@ namespace Curse.NET
 			ModelExtensions.Api = curseApi;
 			// Load server list and friends list
 			LoadContacts();
-			// Forward socket events
-			ForwardEvents();
-
+			// Create a session
 			session = curseApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
+			// Connect the Websocket
+			ConnectSocket();
+		}
+
+		private void ConnectSocket()
+		{
+			socketApi = new SocketApi();
+			ForwardEvents();
 			socketApi.Connect(new Uri(session.NotificationServiceUrl), login.Session.Token);
+
+			var semaphore = new SemaphoreSlim(0, 1);
+			SocketLoginResponse response = null;
+			socketApi.LoginReceived += rs =>
+			{
+				response = rs;
+				semaphore.Release();
+			};
 			socketApi.Login(session.MachineKey, session.SessionID, session.User.UserID);
-			socketApi.Listen();
+			if (semaphore.Wait(TimeSpan.FromSeconds(30)))
+			{
+				if (response.Status != 1)
+				{
+					throw new LoginException("Unable to connect to the Curse Websocket server. The server denied the login request.", response.Status);
+				}
+			}
 		}
 
 		private void LoadContacts()
@@ -65,10 +88,21 @@ namespace Curse.NET
 
 		private void ForwardEvents()
 		{
+			socketApi.SocketClosed += SocketApiOnSocketClosed;
 			socketApi.MessageReceived += OnMessageReceived;
 			socketApi.ChannelMarkedRead += OnChannelMarkedRead;
 			socketApi.MessageChanged += OnMessageChanged;
 			socketApi.UserActivityChange += OnUserActivityChange;
+		}
+
+		private void SocketApiOnSocketClosed()
+		{
+			socketApi.Dispose();
+			if (AutoReconnect)
+			{
+				ConnectSocket();
+				WebsocketReconnected?.Invoke();
+			}
 		}
 
 		private void OnUserActivityChange(UserActivityChangeResponse activity)

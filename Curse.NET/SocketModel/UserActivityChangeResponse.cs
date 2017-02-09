@@ -18,7 +18,7 @@ namespace Curse.NET.SocketModel
 		public int UserID { get; set; }
 		public int ConnectionStatus { get; set; }
 		public int GameID { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DateLastSeen { get; set; }
 		public bool IsActive { get; set; }
 	}

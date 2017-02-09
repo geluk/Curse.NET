@@ -30,13 +30,19 @@ namespace Curse.NET.SocketModel
 					obj.Body = JsonConvert.DeserializeObject<ChannelMarkedReadResponse>(body);
 					break;
 				case ResponseType.Unknown1:
-					// might be a name mention?
+					// Sent when a message is posted to a channel
+					break;
+				case ResponseType.Unknown2:
+					// Sent during login
 					break;
 				case ResponseType.ChannelStatusChanged:
 					obj.Body = JsonConvert.DeserializeObject<ChannelStatusChangedResponse>(body);
 					break;
 				case ResponseType.FriendshipStatus:
-					obj.Body = JsonConvert.DeserializeObject<FriendshipResponse>(body);
+					obj.Body = JsonConvert.DeserializeObject<FriendshipStatusResponse>(body);
+					break;
+				case ResponseType.FriendRemoved:
+					// Sent when a friend request is declined, or when someone removes you as friend
 					break;
 				default:
 					break;

@@ -56,6 +56,7 @@
     <Compile Include="ClientEvents.cs" />
     <Compile Include="CurseApi.cs" />
     <Compile Include="CurseClient.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="ExtensionMethods\DateTimeExtensions.cs" />
     <Compile Include="ExtensionMethods\WebSocketExtensions.cs" />
     <Compile Include="MicrosecondEpochConverter.cs" />
@@ -72,14 +73,15 @@
     <Compile Include="SocketApi.cs" />
     <Compile Include="SocketModel\ChannelMarkedReadResponse.cs" />
     <Compile Include="SocketModel\ChannelStatusChangedResponse.cs" />
-    <Compile Include="SocketModel\FriendshipResponse.cs" />
+    <Compile Include="SocketModel\FriendRemovedResponse.cs" />
+    <Compile Include="SocketModel\FriendshipStatusResponse.cs" />
     <Compile Include="SocketModel\LoginRequest.cs" />
+    <Compile Include="SocketModel\RegionId.cs" />
     <Compile Include="SocketModel\SocketLoginResponse.cs" />
     <Compile Include="SocketModel\MessageResponse.cs" />
     <Compile Include="SocketModel\MessageType.cs" />
     <Compile Include="SocketModel\RequestBody.cs" />
     <Compile Include="SocketModel\ResponseBody.cs" />
-    <Compile Include="SocketEvents.cs" />
     <Compile Include="SocketModel\SocketRequest.cs" />
     <Compile Include="SocketModel\SocketResponse.cs" />
     <Compile Include="SocketModel\MessageChangedResponse.cs" />

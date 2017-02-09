@@ -4,18 +4,18 @@ using Newtonsoft.Json;
 namespace Curse.NET.SocketModel
 {
 
-	public class FriendshipResponse : ResponseBody
+	public class FriendshipStatusResponse : ResponseBody
 	{
 		public Friendship Friendship { get; set; }
 	}
 
 	public class Friendship
 	{
-		public int Status { get; set; }
+		public FriendshipStatus Status { get; set; }
 		public int OtherUserID { get; set; }
 		public string OtherUsername { get; set; }
 		public string OtherUserNickname { get; set; }
-		public int OtherUserRegionID { get; set; }
+		public RegionId OtherUserRegionID { get; set; }
 		public int OtherUserConnectionStatus { get; set; }
 		public object InvitationMessage { get; set; }
 		public bool IsFavorite { get; set; }
@@ -36,6 +36,14 @@ namespace Curse.NET.SocketModel
 		public DateTime RequestedTimestamp { get; set; }
 		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime AvatarTimestamp { get; set; }
+
+		//public bool IsRequest => Status == FriendshipStatus.RequestReceived && DateConfirmed == DateTime.MinValue;
 	}
 
+	public enum FriendshipStatus
+	{
+		RequestReceived = 0,
+		RequestSent = 1,
+		Friend = 2
+	}
 }

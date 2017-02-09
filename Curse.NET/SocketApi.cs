@@ -21,18 +21,22 @@ using WebSocketSharp.Net;
 
 namespace Curse.NET
 {
-	internal class SocketApi
+	internal class SocketApi : IDisposable
 	{
 #if NETSOCKET
 		private readonly ClientWebSocket webSocket = new ClientWebSocket();
 #else
 		private WebSocket webSocket;
 #endif
+		public event Action<MessageResponse> MessageReceived;
+		public event Action<ChannelMarkedReadResponse> ChannelMarkedRead;
+		public event Action<MessageChangedResponse> MessageChanged;
+		public event Action<FriendshipStatusResponse> FriendshipStatusChanged;
+		public event Action<UserActivityChangeResponse> UserActivityChange;
+		public event Action<FriendRemovedResponse> FriendRemoved;
+		public event Action<ChannelStatusChangedResponse> ChannelStatusChanged;
+		public event Action<SocketLoginResponse> LoginReceived;
 
-		public event SocketMessageReceivedEvent MessageReceived;
-		public event ChannelMarkedReadEvent ChannelMarkedRead;
-		public event MessageChangedEvent MessageChanged;
-		public event UserActivityChangeEvent UserActivityChange;
 		public event Action SocketClosed;
 
 #if NETSOCKET
@@ -41,6 +45,7 @@ namespace Curse.NET
 			webSocket.Options.SetRequestHeader("Origin", "https://www.curse.com");
 			webSocket.Options.SetRequestHeader("Cookie", "CurseAuthToken=" + WebUtility.UrlEncode(authToken));
 			webSocket.ConnectAsync(wsUri, CancellationToken.None).Wait();
+		L	Listen();
 		}
 #elif WEBSOCKET4NET
 		public void Connect(Uri wsUri, string authToken)
@@ -130,9 +135,9 @@ namespace Curse.NET
 #endif
 		}
 
-		public void Listen()
-		{
 #if NETSOCKET
+		private void Listen()
+		{
 			Task.Run(() =>
 			{
 				while (webSocket.CloseStatus == null)
@@ -151,8 +156,8 @@ namespace Curse.NET
 
 				}
 			});
-#endif
 		}
+#endif
 
 		private void ProcessMessage(SocketResponse message)
 		{
@@ -168,18 +173,30 @@ namespace Curse.NET
 					MessageReceived?.Invoke((MessageResponse)message.Body);
 					break;
 				case ResponseType.Login:
+					LoginReceived?.Invoke((SocketLoginResponse)message.Body);
 					break;
 				case ResponseType.MessageChanged:
 					MessageChanged?.Invoke((MessageChangedResponse)message.Body);
 					break;
 				case ResponseType.ChannelStatusChanged:
-					// TODO: implement ChannelStatusChanged event
+					ChannelStatusChanged?.Invoke((ChannelStatusChangedResponse)message.Body);
 					break;
 				case ResponseType.Unknown1:
+					break;
+				case ResponseType.FriendshipStatus:
+					FriendshipStatusChanged?.Invoke((FriendshipStatusResponse)message.Body);
+					break;
+				case ResponseType.FriendRemoved:
+					FriendRemoved?.Invoke((FriendRemovedResponse)message.Body);
 					break;
 				default:
 					break;
 			}
+		}
+
+		public void Dispose()
+		{
+			webSocket.Dispose();
 		}
 	}
 }
