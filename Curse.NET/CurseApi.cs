@@ -36,7 +36,8 @@ namespace Curse.NET
 			rq.Headers["AuthenticationToken"] = AuthToken;
 			using (var writer = new StreamWriter(rq.GetRequestStream()))
 			{
-				writer.Write(JsonConvert.SerializeObject(obj));
+				var text = JsonConvert.SerializeObject(obj);
+				writer.Write(text);
 			}
 			var response = rq.GetResponse();
 			using (var reader = new StreamReader(response.GetResponseStream()))
