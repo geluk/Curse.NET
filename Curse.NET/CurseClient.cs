@@ -11,7 +11,7 @@ namespace Curse.NET
 	public class CurseClient
 	{
 		private readonly CurseApi curseApi = new CurseApi();
-		private SocketApi socketApi;
+		private readonly SocketApi socketApi = new SocketApi();
 		private LoginResponse login;
 		private SessionResponse session;
 
@@ -26,6 +26,8 @@ namespace Curse.NET
 		public IReadOnlyDictionary<string, Channel> ChannelMap { get; private set; }
 		// TODO: implement this
 		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
+
+		public bool Connected => socketApi.Connected;
 
 		public const string Version = "0.1.4";
 
@@ -56,7 +58,6 @@ namespace Curse.NET
 
 		private void ConnectSocket()
 		{
-			socketApi = new SocketApi();
 			ForwardEvents();
 			socketApi.Connect(new Uri(session.NotificationServiceUrl), login.Session.Token);
 

@@ -40,6 +40,7 @@ namespace Curse.NET
 		public event Action SocketClosed;
 
 		private Timer pingTimer;
+		public bool Connected => webSocket.State == WebSocketState.Open;
 
 #if NETSOCKET
 		public void Connect(Uri wsUri, string authToken)
