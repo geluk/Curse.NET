@@ -6,11 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Curse.NET.SocketModel;
 using Newtonsoft.Json;
-using SuperSocket.ClientEngine;
 #if NETSOCKET
 using System.Net;
 using System.Net.WebSockets;
 #elif WEBSOCKET4NET
+using SuperSocket.ClientEngine;
 using WebSocket4Net;
 using System.Collections.Generic;
 using System.Net;
