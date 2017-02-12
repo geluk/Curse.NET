@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Curse.NET.ExtensionMethods;
 using Curse.NET.Model;
 using Curse.NET.SocketModel;
 
@@ -169,6 +170,15 @@ namespace Curse.NET
 		public void SendMessage(Channel clientChannel, string message)
 		{
 			SendMessage(clientChannel.GroupID, message);
+		}
+
+		public FoundMessage[] GetMessages(string channelId, DateTime start, DateTime end, int pageSize)
+		{
+			var startTs = start == DateTime.MinValue ? 0 : start.ToTimestamp();
+			var endTs = end == DateTime.MaxValue ? 0 : end.ToTimestamp();
+
+			var rs = curseApi.Get<FoundMessage[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
+			return rs;
 		}
 	}
 }
