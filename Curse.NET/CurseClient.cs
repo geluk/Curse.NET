@@ -9,7 +9,7 @@ using Curse.NET.SocketModel;
 
 namespace Curse.NET
 {
-	public class CurseClient
+	public class CurseClient : IDisposable
 	{
 		private readonly CurseApi curseApi = new CurseApi();
 		private readonly SocketApi socketApi = new SocketApi();
@@ -179,6 +179,11 @@ namespace Curse.NET
 
 			var rs = curseApi.Get<FoundMessage[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
 			return rs;
+		}
+
+		public void Dispose()
+		{
+			socketApi?.Dispose();
 		}
 	}
 }
