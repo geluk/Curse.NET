@@ -14,6 +14,11 @@ namespace Curse.NET.ExtensionMethods
 			return (long) ms;
 		}
 
+		public static int ToShortTimestamp(this DateTime date)
+		{
+			return (int)(date - Epoch).TotalSeconds;
+		}
+
 		public static DateTime FromTimestamp(long timestamp)
 		{
 			return Epoch.AddMilliseconds(timestamp);

@@ -172,6 +172,13 @@ namespace Curse.NET
 			SendMessage(clientChannel.GroupID, message);
 		}
 
+		public void DeleteMessage(string conversationId, DateTime timestamp)
+		{
+			var channel = ChannelMap[conversationId];
+			var group = GroupMap[channel.GroupID];
+			curseApi.Delete($"https://conversations-v1.curseapp.net/conversations/{channel.GroupID}/{channel.RootGroupID}-{timestamp.ToShortTimestamp()}");
+		}
+
 		public FoundMessage[] GetMessages(string channelId, DateTime start, DateTime end, int pageSize)
 		{
 			var startTs = start == DateTime.MinValue ? 0 : start.ToTimestamp();

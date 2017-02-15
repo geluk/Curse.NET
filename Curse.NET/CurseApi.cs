@@ -69,6 +69,20 @@ namespace Curse.NET
 				return responseText;
 			}
 		}
+
+		public void Delete(string url)
+		{
+			var rq = WebRequest.CreateHttp(url);
+			rq.Method = "DELETE";
+			rq.Headers["AuthenticationToken"] = AuthToken;
+			var response = rq.GetResponse();
+			using (var reader = new StreamReader(response.GetResponseStream()))
+			{
+				var responseText = reader.ReadToEnd();
+				;
+				//return responseText;
+			}
+		}
 	}
 
 
