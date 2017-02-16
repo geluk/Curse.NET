@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using Curse.NET.ExtensionMethods;
 using Curse.NET.Model;
 using Curse.NET.SocketModel;
 
@@ -13,7 +12,6 @@ namespace Curse.NET
 	{
 		private readonly SocketApi socketApi = new SocketApi();
 		private LoginResponse login;
-		private SessionResponse session;
 		private Timer loginRenwalTimer;
 
 		public event Action<Group, Channel, MessageResponse> MessageReceived;
@@ -50,7 +48,7 @@ namespace Curse.NET
 			// Load server list and friends list
 			LoadContacts();
 			// Create a session
-			session = CurseApi.CreateSession();
+			CurseApi.CreateSession();
 			// Connect the Websocket
 			ConnectSocket();
 			ScheduleTokenRenewal(new NetworkCredential(username, password));
@@ -81,7 +79,7 @@ namespace Curse.NET
 		private void ConnectSocket()
 		{
 			ForwardEvents();
-			socketApi.Connect(new Uri(session.NotificationServiceUrl), login.Session.Token);
+			socketApi.Connect(new Uri(CurseApi.Session.NotificationServiceUrl), login.Session.Token);
 
 			var semaphore = new SemaphoreSlim(0, 1);
 			SocketLoginResponse response = null;
@@ -90,7 +88,7 @@ namespace Curse.NET
 				response = rs;
 				semaphore.Release();
 			};
-			socketApi.Login(session.MachineKey, session.SessionID, session.User.UserID);
+			socketApi.Login(CurseApi.Session.MachineKey, CurseApi.Session.SessionID, CurseApi.Session.User.UserID);
 			if (semaphore.Wait(TimeSpan.FromSeconds(30)))
 			{
 				if (response.Status != 1)
@@ -140,7 +138,7 @@ namespace Curse.NET
 					// TODO: handle edits/deletes
 					return;
 				}
-				MessageReceived?.Invoke(@group, channel, message);
+				MessageReceived?.Invoke(group, channel, message);
 			}
 			else
 			{

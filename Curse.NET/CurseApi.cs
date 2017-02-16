@@ -11,14 +11,19 @@ namespace Curse.NET
 {
 	public class CurseApi
 	{
-		private HttpApi httpApi;
-		private SessionResponse session;
+		private readonly HttpApi httpApi = new HttpApi();
+		public SessionResponse Session { get; private set; }
 
 		public LoginResponse Login(string username, string password)
 		{
 			username = WebUtility.UrlEncode(username);
 			password = WebUtility.UrlEncode(password);
 			return httpApi.Post<LoginResponse>("https://logins-v1.curseapp.net/login", $"username={username}&password={password}");
+		}
+
+		public void CreateSession()
+		{
+			Session = httpApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
 		}
 
 		public void SetAuthToken(string authToken)
@@ -28,12 +33,12 @@ namespace Curse.NET
 
 		public void SendMessage(string groupId, int userId, string message)
 		{
-			httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{groupId}:{userId}:{session.User.UserID}", new SendMessageRequest
+			httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{groupId}:{userId}:{Session.User.UserID}", new SendMessageRequest
 			{
 				Body = message,
 				// TODO: Verify that SessionID should be used here
-				ClientID = session.SessionID,
-				MachineKey = session.MachineKey
+				ClientID = Session.SessionID,
+				MachineKey = Session.MachineKey
 			});
 		}
 
@@ -43,8 +48,8 @@ namespace Curse.NET
 			{
 				Body = message,
 				// TODO: Verify that SessionID should be used here
-				ClientID = session.SessionID,
-				MachineKey = session.MachineKey
+				ClientID = Session.SessionID,
+				MachineKey = Session.MachineKey
 			});
 		}
 
@@ -101,11 +106,6 @@ namespace Curse.NET
 
 			var rs = httpApi.Get<Message[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
 			return rs;
-		}
-
-		public SessionResponse CreateSession()
-		{
-			return httpApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
 		}
 	}
 }

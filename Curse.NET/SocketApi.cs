@@ -69,13 +69,13 @@ namespace Curse.NET
 			webSocket.MessageReceived += MessageHandler;
 			webSocket.Open();
 			semaphore.Wait();
-			/*pingTimer = new Timer(state =>
+			pingTimer = new Timer(state =>
 			{
 				if (webSocket.State == WebSocketState.Open)
 				{
 					SendMessage(PingRequest.Create());
 				}
-			}, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));*/
+			}, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
 		}
 
 		private void ErrorHandler(object sender, ErrorEventArgs errorEventArgs)
