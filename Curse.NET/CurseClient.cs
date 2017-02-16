@@ -15,6 +15,9 @@ namespace Curse.NET
 		private readonly SocketApi socketApi = new SocketApi();
 		private LoginResponse login;
 		private SessionResponse session;
+		private Timer loginRenwalTimer;
+		private string username;
+		private string password;
 
 		public event MessageReceivedEvent MessageReceived;
 		public event Action WebsocketReconnected;
@@ -55,6 +58,13 @@ namespace Curse.NET
 			session = curseApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
 			// Connect the Websocket
 			ConnectSocket();
+			// Renew the auth token an hour before it times out.
+			loginRenwalTimer = new Timer(HandleTokenRenewal, null, login.Session.RenewAfter - DateTime.Now - TimeSpan.FromHours(1), TimeSpan.FromMilliseconds(-1));
+		}
+
+		private void HandleTokenRenewal(object state)
+		{
+			// TODO: renew the API token
 		}
 
 		private void ConnectSocket()
