@@ -1,4 +1,7 @@
-﻿namespace Curse.NET.Model
+﻿using System;
+using Newtonsoft.Json;
+
+namespace Curse.NET.Model
 {
 	public class LoginResponse
 	{
@@ -18,8 +21,10 @@
 		public bool EffectivePremiumStatus { get; set; }
 		public bool ActualPremiumStatus { get; set; }
 		public int SubscriptionToken { get; set; }
-		public long Expires { get; set; }
-		public long RenewAfter { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime Expires { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime RenewAfter { get; set; }
 		public bool IsTemporaryAccount { get; set; }
 	}
 }

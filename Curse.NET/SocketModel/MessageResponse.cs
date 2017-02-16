@@ -6,6 +6,9 @@ namespace Curse.NET.SocketModel
 	public class MessageResponse : ResponseBody
 	{
 		public string ClientID { get; set; }
+		/// <summary>
+		/// Despite its name, this actually seems to be more of a message ID.
+		/// </summary>
 		public string ServerID { get; set; }
 		public string ConversationID { get; set; }
 		public string ContactID { get; set; }

@@ -156,6 +156,18 @@ namespace Curse.NET
 		/// </summary>
 		public Group FindGroup(string name) => Groups.FirstOrDefault(g => g.GroupTitle == name);
 
+
+		public void SendMessage(string groupId, int userId, string message)
+		{
+			var rs = curseApi.Post($"https://conversations-v1.curseapp.net/conversations/{groupId}:{userId}:{session.User.UserID}", new SendMessageRequest
+			{
+				Body = message,
+				// TODO: Verify that SessionID should be used here
+				ClientID = session.SessionID,
+				MachineKey = session.MachineKey
+			});
+		}
+
 		public void SendMessage(string channelId, string message)
 		{
 			var rs = curseApi.Post($"https://conversations-v1.curseapp.net/conversations/{channelId}", new SendMessageRequest
@@ -172,11 +184,11 @@ namespace Curse.NET
 			SendMessage(clientChannel.GroupID, message);
 		}
 
-		public void DeleteMessage(string conversationId, DateTime timestamp)
+		public void DeleteMessage(string conversationId, string serverId, DateTime timestamp)
 		{
 			var channel = ChannelMap[conversationId];
-			var group = GroupMap[channel.GroupID];
-			curseApi.Delete($"https://conversations-v1.curseapp.net/conversations/{channel.GroupID}/{channel.RootGroupID}-{timestamp.ToShortTimestamp()}");
+			var group = GroupMap[channel.RootGroupID];
+			curseApi.Delete($"https://conversations-v1.curseapp.net/conversations/{channel.GroupID}/{serverId}-{timestamp.ToTimestamp()}");
 		}
 
 		public FoundMessage[] GetMessages(string channelId, DateTime start, DateTime end, int pageSize)
