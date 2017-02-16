@@ -79,7 +79,7 @@ namespace Curse.NET
 
 		private void ErrorHandler(object sender, ErrorEventArgs errorEventArgs)
 		{
-			throw new NotImplementedException();
+			SocketClosed?.Invoke();
 		}
 
 		private void ClosedHandler(object sender, EventArgs eventArgs)
