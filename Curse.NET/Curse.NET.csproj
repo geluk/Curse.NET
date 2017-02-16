@@ -57,14 +57,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientEvents.cs" />
     <Compile Include="CurseApi.cs" />
+    <Compile Include="HttpApi.cs" />
     <Compile Include="CurseClient.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="ExtensionMethods\DateTimeExtensions.cs" />
     <Compile Include="ExtensionMethods\WebSocketExtensions.cs" />
     <Compile Include="MicrosecondEpochConverter.cs" />
-    <Compile Include="Model\ContactsRequest.cs" />
+    <Compile Include="Model\ContactsResponse.cs" />
     <Compile Include="Model\ConversationsRequest.cs" />
     <Compile Include="Model\GetMessagesResponse.cs" />
     <Compile Include="Model\LoginResponse.cs" />
@@ -83,7 +83,7 @@
     <Compile Include="SocketModel\LoginRequest.cs" />
     <Compile Include="SocketModel\PingRequest.cs" />
     <Compile Include="SocketModel\PingResponse.cs" />
-    <Compile Include="SocketModel\RegionId.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="SocketModel\ClientPreferencesResponse.cs" />
     <Compile Include="SocketModel\SocketLoginResponse.cs" />
     <Compile Include="SocketModel\MessageResponse.cs" />

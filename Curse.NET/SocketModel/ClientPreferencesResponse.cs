@@ -8,10 +8,10 @@ namespace Curse.NET.SocketModel
 {
 	public class ClientPreferencesResponse : ResponseBody
 	{
-		public User User { get; set; }
+		public Client User { get; set; }
 	}
 
-	public class User
+	public class Client
 	{
 		public int UserID { get; set; }
 		public string Username { get; set; }

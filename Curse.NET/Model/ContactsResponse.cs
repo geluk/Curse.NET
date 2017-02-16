@@ -4,7 +4,7 @@ using Curse.NET.SocketModel;
 namespace Curse.NET.Model
 {
 
-	public class ContactsRequest : RequestObject
+	public class ContactsResponse : RequestObject
 	{
 		public Friend[] Friends { get; set; }
 		public Group[] Groups { get; set; }
@@ -36,12 +36,6 @@ namespace Curse.NET.Model
 		public long AvatarTimestamp { get; set; }
 
 		public override string ToString() => $"{OtherUserNickname ?? OtherUsername} ({Status})";
-	}
-
-	public enum FriendStatus
-	{
-		FriendRequest = 0,
-		Friend = 2
 	}
 
 	public class Group

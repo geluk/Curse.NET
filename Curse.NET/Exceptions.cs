@@ -25,4 +25,9 @@ namespace Curse.NET
 			StatusCode = statusCode;
 		}
 	}
+
+	public class NotAuthorisedException : CurseDotNetException
+	{
+		public NotAuthorisedException(string message) : base(message) { }
+	}
 }

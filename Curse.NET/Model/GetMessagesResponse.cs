@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace Curse.NET.Model
 {
-	public class FoundMessage
+	public class Message
 	{
 		public object ClientID { get; set; }
 		public string ServerID { get; set; }

@@ -11,35 +11,32 @@ namespace Curse.NET
 {
 	public class CurseClient : IDisposable
 	{
-		private readonly CurseApi curseApi = new CurseApi();
 		private readonly SocketApi socketApi = new SocketApi();
 		private LoginResponse login;
 		private SessionResponse session;
 		private Timer loginRenwalTimer;
-		private string username;
-		private string password;
 
-		public event MessageReceivedEvent MessageReceived;
+		public event Action<Group, Channel, MessageResponse> MessageReceived;
+		public event Action<Group, UserResponse, MessageResponse> PrivateMessageReceived;
 		public event Action WebsocketReconnected;
 		public event Action ConnectionLost;
 
+		public CurseApi CurseApi { get; } = new CurseApi();
 		public bool AutoReconnect { get; set; } = true;
 
 		public IReadOnlyList<Group> Groups { get; private set; }
 		public IReadOnlyList<Friend> Friends { get; private set; }
 		public IReadOnlyDictionary<string, Channel> ChannelMap { get; private set; }
-		// TODO: implement this
 		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
 
 		public bool Connected => socketApi.Connected;
 
 		public const string Version = "0.1.4";
 
+		#region Connection methods
 		public void Connect(string username, string password)
 		{
-			username = WebUtility.UrlEncode(username);
-			password = WebUtility.UrlEncode(password);
-			login = curseApi.Post<LoginResponse>("https://logins-v1.curseapp.net/login", $"username={username}&password={password}");
+			login = CurseApi.Login(username, password);
 			if (login.StatusMessage != null)
 			{
 				throw new Exception(login.StatusMessage);
@@ -49,17 +46,31 @@ namespace Curse.NET
 				throw new Exception("Unable to connect");
 			}
 			// Connected successfully; set the API auth token
-			curseApi.AuthToken = login.Session.Token;
-			// Bit of a hack. Oh well.
-			ModelExtensions.Api = curseApi;
+			CurseApi.SetAuthToken(login.Session.Token);
 			// Load server list and friends list
 			LoadContacts();
 			// Create a session
-			session = curseApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
+			session = CurseApi.CreateSession();
 			// Connect the Websocket
 			ConnectSocket();
+			ScheduleTokenRenewal(new NetworkCredential(username, password));
+		}
+
+		private void LoadContacts()
+		{
+			var contacts = CurseApi.LoadContacts();
+			Groups = contacts.Groups;
+			Friends = contacts.Friends;
+
+			ChannelMap = Groups.SelectMany(g => g.Channels).ToDictionary(c => c.GroupID);
+			GroupMap = Groups.ToDictionary(g => g.GroupID);
+		}
+
+		private void ScheduleTokenRenewal(NetworkCredential credentials)
+		{
 			// Renew the auth token an hour before it times out.
-			loginRenwalTimer = new Timer(HandleTokenRenewal, null, login.Session.RenewAfter - DateTime.Now - TimeSpan.FromHours(1), TimeSpan.FromMilliseconds(-1));
+			var timeout = login.Session.RenewAfter - DateTime.Now - TimeSpan.FromHours(1);
+			loginRenwalTimer = new Timer(HandleTokenRenewal, credentials, timeout, TimeSpan.FromMilliseconds(-1));
 		}
 
 		private void HandleTokenRenewal(object state)
@@ -88,27 +99,19 @@ namespace Curse.NET
 				}
 			}
 		}
+		#endregion
 
-		private void LoadContacts()
-		{
-			var contacts = curseApi.Get<ContactsRequest>("https://contacts-v1.curseapp.net/contacts");
-			Groups = contacts.Groups;
-			Friends = contacts.Friends;
-
-			ChannelMap = Groups.SelectMany(g => g.Channels).ToDictionary(c => c.GroupID);
-			GroupMap = Groups.ToDictionary(g => g.GroupID);
-		}
-
+		#region Socket event handlers
 		private void ForwardEvents()
 		{
-			socketApi.SocketClosed += SocketApiOnSocketClosed;
-			socketApi.MessageReceived += OnMessageReceived;
-			socketApi.ChannelMarkedRead += OnChannelMarkedRead;
-			socketApi.MessageChanged += OnMessageChanged;
-			socketApi.UserActivityChange += OnUserActivityChange;
+			socketApi.SocketClosed += HandleSocketClosed;
+			socketApi.MessageReceived += HandleMessageReceived;
+			socketApi.ChannelMarkedRead += HandleChannelMarkedRead;
+			socketApi.MessageChanged += HandleMessageChanged;
+			socketApi.UserActivityChange += HandleUserActivityChange;
 		}
 
-		private void SocketApiOnSocketClosed()
+		private void HandleSocketClosed()
 		{
 			socketApi.Dispose();
 			if (AutoReconnect)
@@ -122,15 +125,34 @@ namespace Curse.NET
 			}
 		}
 
-		private void OnUserActivityChange(UserActivityChangeResponse activity)
+		private void HandleMessageReceived(MessageResponse message)
 		{
-			var group = GroupMap[activity.GroupID];
-			var user = group.LookupUser(activity.Users.First().UserID);
-			// TODO: handle user activity change
-			return;
+			if (message.SenderID == login.Session.UserID) return;
+
+			var split = message.ConversationID.Split(':');
+			if (split.Length == 1)
+			{
+				// Regular message
+				var channel = ChannelMap[message.ConversationID];
+				var group = GroupMap[message.RootConversationID];
+				if (message.DeletedUserID != 0 || message.EditedUserID != 0)
+				{
+					// TODO: handle edits/deletes
+					return;
+				}
+				MessageReceived?.Invoke(@group, channel, message);
+			}
+			else
+			{
+				var group = GroupMap[message.RootConversationID];
+				var otherUser = CurseApi.GetMember(group.GroupID, int.Parse(split.Skip(1).First(id => id != login.Session.UserID.ToString())));
+				PrivateMessageReceived?.Invoke(group, otherUser, message);
+			}
 		}
 
-		private void OnMessageChanged(MessageChangedResponse change)
+		private void HandleChannelMarkedRead(ChannelMarkedReadResponse channel) { }
+
+		private void HandleMessageChanged(MessageChangedResponse change)
 		{
 			switch (change.ChangeType)
 			{
@@ -143,22 +165,46 @@ namespace Curse.NET
 			}
 		}
 
-		private void OnChannelMarkedRead(ChannelMarkedReadResponse channel)
+		private void HandleUserActivityChange(UserActivityChangeResponse activity)
 		{
-			var ch = ChannelMap[channel.ConversationID];
-			;
+			//var user = GetUser(GroupMap[activity.GroupID], activity.Users.First().UserID);
+			// TODO: handle activity change
+		}
+		#endregion
+
+		#region API wrappers
+		public void KickUser(Group group, UserResponse user)
+		{
+			CurseApi.KickUser(group.GroupID, user.UserID);
 		}
 
-		private void OnMessageReceived(MessageResponse message)
+		public void DeleteMessage(MessageResponse message)
 		{
-			var channel = ChannelMap[message.ConversationID];
-			var group = GroupMap[message.RootConversationID];
-			if (message.DeletedUserID != 0 || message.EditedUserID != 0)
-			{
-				;
-			}
-			MessageReceived?.Invoke(@group, channel, message);
+			CurseApi.DeleteMessage(message.ConversationID, message.ServerID, message.Timestamp);
+		}
 
+		public void SendMessage(Channel clientChannel, string message)
+		{
+			CurseApi.SendMessage(clientChannel.GroupID, message);
+		}
+
+		public void SendMessage(Group group, UserResponse user, string message)
+		{
+			CurseApi.SendMessage(group.GroupID, user.UserID, message);
+		}
+		#endregion
+
+		public void Dispose()
+		{
+			loginRenwalTimer?.Dispose();
+			socketApi?.Dispose();
+		}
+
+		#region Lookup methods
+		public UserResponse GetUser(Group group, int userId)
+		{
+			// TODO: cache these results
+			return CurseApi.GetMember(group.GroupID, userId);
 		}
 
 		/// <summary>
@@ -166,53 +212,12 @@ namespace Curse.NET
 		/// </summary>
 		public Group FindGroup(string name) => Groups.FirstOrDefault(g => g.GroupTitle == name);
 
-
-		public void SendMessage(string groupId, int userId, string message)
+		public UserResponse FindMember(string groupId, string name)
 		{
-			var rs = curseApi.Post($"https://conversations-v1.curseapp.net/conversations/{groupId}:{userId}:{session.User.UserID}", new SendMessageRequest
-			{
-				Body = message,
-				// TODO: Verify that SessionID should be used here
-				ClientID = session.SessionID,
-				MachineKey = session.MachineKey
-			});
+			var matches = CurseApi.FindMembers(groupId, name);
+			if (matches.Length > 1) throw new ArgumentException("Ambiguous username");
+			return matches.FirstOrDefault();
 		}
-
-		public void SendMessage(string channelId, string message)
-		{
-			var rs = curseApi.Post($"https://conversations-v1.curseapp.net/conversations/{channelId}", new SendMessageRequest
-			{
-				Body = message,
-				// TODO: Verify that SessionID should be used here
-				ClientID = session.SessionID,
-				MachineKey = session.MachineKey
-			});
-		}
-
-		public void SendMessage(Channel clientChannel, string message)
-		{
-			SendMessage(clientChannel.GroupID, message);
-		}
-
-		public void DeleteMessage(string conversationId, string serverId, DateTime timestamp)
-		{
-			var channel = ChannelMap[conversationId];
-			var group = GroupMap[channel.RootGroupID];
-			curseApi.Delete($"https://conversations-v1.curseapp.net/conversations/{channel.GroupID}/{serverId}-{timestamp.ToTimestamp()}");
-		}
-
-		public FoundMessage[] GetMessages(string channelId, DateTime start, DateTime end, int pageSize)
-		{
-			var startTs = start == DateTime.MinValue ? 0 : start.ToTimestamp();
-			var endTs = end == DateTime.MaxValue ? 0 : end.ToTimestamp();
-
-			var rs = curseApi.Get<FoundMessage[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
-			return rs;
-		}
-
-		public void Dispose()
-		{
-			socketApi?.Dispose();
-		}
+		#endregion
 	}
 }
