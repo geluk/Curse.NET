@@ -28,6 +28,7 @@ namespace Curse.NET
 		public IReadOnlyDictionary<string, Group> GroupMap { get; private set; }
 
 		public bool Connected => socketApi.Connected;
+		public SessionUser Self => CurseApi.Session.User;
 
 		public const string Version = "0.1.4";
 
