@@ -216,9 +216,9 @@ namespace Curse.NET
 		/// </summary>
 		public Group FindGroup(string name) => Groups.FirstOrDefault(g => g.GroupTitle == name);
 
-		public UserResponse FindMember(string groupId, string name)
+		public UserResponse FindMember(Group group, string name)
 		{
-			var matches = CurseApi.FindMembers(groupId, name);
+			var matches = FindMembers(group, name);
 			if (matches.Length > 1) throw new ArgumentException("Ambiguous username");
 			return matches.FirstOrDefault();
 		}
