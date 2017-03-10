@@ -191,6 +191,11 @@ namespace Curse.NET
 		{
 			CurseApi.SendMessage(group.GroupID, user.UserID, message);
 		}
+
+		public UserResponse[] FindMembers(Group group, string query)
+		{
+			return CurseApi.FindMembers(group.GroupID, query);
+		}
 		#endregion
 
 		public void Dispose()
