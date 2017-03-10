@@ -104,8 +104,15 @@ namespace Curse.NET
 			var startTs = start == DateTime.MinValue ? 0 : start.ToTimestamp();
 			var endTs = end == DateTime.MaxValue ? 0 : end.ToTimestamp();
 
-			var rs = httpApi.Get<Message[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
-			return rs;
+			try
+			{
+				var rs = httpApi.Get<Message[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
+				return rs;
+			}
+			catch (WebException e) when((e.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.Forbidden)
+			{
+				throw new NotAuthorisedException("You are not authorised to view the messages for this channel.");
+			}
 		}
 	}
 }
