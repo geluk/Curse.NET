@@ -177,6 +177,11 @@ namespace Curse.NET
 			CurseApi.KickUser(group.GroupID, user.UserID);
 		}
 
+		public void BanUser(Group group, UserResponse user)
+		{
+			CurseApi.BanUser(group.RootGroupID, user.UserID);
+		}
+
 		public void DeleteMessage(MessageResponse message)
 		{
 			CurseApi.DeleteMessage(message.ConversationID, message.ServerID, message.Timestamp);

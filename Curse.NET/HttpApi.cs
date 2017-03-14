@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using Curse.NET.Model;
 using Newtonsoft.Json;
 
@@ -10,40 +11,37 @@ namespace Curse.NET
 		public string AuthToken { get; set; }
 
 
-		public T Post<T>(string url, string payload)
+		public string Post(string url, string payload = null)
 		{
 			var rq = WebRequest.CreateHttp(url);
 			rq.Method = "POST";
 			rq.ContentType = "application/x-www-form-urlencoded";
 			rq.CookieContainer = new CookieContainer();
-			using (var writer = new StreamWriter(rq.GetRequestStream()))
+			if (payload != null)
 			{
-				writer.Write(payload);
-			}
-			var response = rq.GetResponse();
-			using (var reader = new StreamReader(response.GetResponseStream()))
-			{
-				return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
-			}
-		}
-
-
-		public string Post(string url, RequestObject obj)
-		{
-			var rq = WebRequest.CreateHttp(url);
-			rq.Method = "POST";
-			rq.ContentType = "application/json";
-			rq.Headers["AuthenticationToken"] = AuthToken;
-			using (var writer = new StreamWriter(rq.GetRequestStream()))
-			{
-				var text = JsonConvert.SerializeObject(obj);
-				writer.Write(text);
+				using (var writer = new StreamWriter(rq.GetRequestStream()))
+				{
+					writer.Write(payload);
+				}
 			}
 			var response = rq.GetResponse();
 			using (var reader = new StreamReader(response.GetResponseStream()))
 			{
 				return reader.ReadToEnd();
 			}
+		}
+
+		public T Post<T>(string url, string payload = null)
+		{
+			var response = Post(url, payload);
+			return JsonConvert.DeserializeObject<T>(response);
+		}
+
+
+		public string Post(string url, RequestObject obj)
+		{
+			var text = JsonConvert.SerializeObject(obj);
+			return Post(url, text);
 		}
 
 		public T Post<T>(string url, RequestObject obj)
@@ -84,7 +82,6 @@ namespace Curse.NET
 			}
 		}
 	}
-
 
 	internal class HttpResponseObject
 	{

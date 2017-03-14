@@ -76,6 +76,11 @@ namespace Curse.NET
 			httpApi.Delete($"https://groups-v1/curseapp.net/groups/{groupId}/members/{userId}");
 		}
 
+		public void BanUser(string serverId, int userId)
+		{
+			httpApi.Post($"https://groups-v1/curseapp.net/servers/{serverId}/members/{userId}");
+		}
+
 		public UserResponse[] FindMembers(string groupId, string name)
 		{
 			return httpApi.Get<UserResponse[]>($"https://groups-v1.curseapp.net/groups/{groupId}/members/simple-search?query={name}");
