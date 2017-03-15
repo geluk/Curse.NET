@@ -78,7 +78,7 @@ namespace Curse.NET
 
 		public void BanUser(string serverId, int userId)
 		{
-			httpApi.Post($"https://groups-v1/curseapp.net/servers/{serverId}/members/{userId}");
+			httpApi.Post($"https://groups-v1/curseapp.net/servers/{serverId}/bans/{userId}");
 		}
 
 		public UserResponse[] FindMembers(string groupId, string name)

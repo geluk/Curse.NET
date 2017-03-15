@@ -11,12 +11,13 @@ namespace Curse.NET
 		public string AuthToken { get; set; }
 
 
-		public string Post(string url, string payload = null)
+		public string PostForm(string url, string payload = null)
 		{
 			var rq = WebRequest.CreateHttp(url);
 			rq.Method = "POST";
 			rq.ContentType = "application/x-www-form-urlencoded";
 			rq.CookieContainer = new CookieContainer();
+			rq.Headers["AuthenticationToken"] = AuthToken;
 			if (payload != null)
 			{
 				using (var writer = new StreamWriter(rq.GetRequestStream()))
@@ -31,17 +32,46 @@ namespace Curse.NET
 			}
 		}
 
-		public T Post<T>(string url, string payload = null)
+		public string PostJson(string url, RequestObject obj)
 		{
-			var response = Post(url, payload);
+			var rq = WebRequest.CreateHttp(url);
+			rq.Method = "POST";
+			rq.ContentType = "application/json";
+			rq.CookieContainer = new CookieContainer();
+			rq.Headers["AuthenticationToken"] = AuthToken;
+			using (var writer = new StreamWriter(rq.GetRequestStream()))
+			{
+				writer.Write(JsonConvert.SerializeObject(obj));
+			}
+			var response = rq.GetResponse();
+			using (var reader = new StreamReader(response.GetResponseStream()))
+			{
+				return reader.ReadToEnd();
+			}
+		}
+
+		public string Post(string url)
+		{
+			var rq = WebRequest.CreateHttp(url);
+			rq.Method = "POST";
+			rq.CookieContainer = new CookieContainer();
+			rq.Headers["AuthenticationToken"] = AuthToken;
+			var response = rq.GetResponse();
+			using (var reader = new StreamReader(response.GetResponseStream()))
+			{
+				return reader.ReadToEnd();
+			}
+		}
+
+		public T Post<T>(string url, string payload)
+		{
+			var response = PostForm(url, payload);
 			return JsonConvert.DeserializeObject<T>(response);
 		}
 
-
 		public string Post(string url, RequestObject obj)
 		{
-			var text = JsonConvert.SerializeObject(obj);
-			return Post(url, text);
+			return PostJson(url, obj);
 		}
 
 		public T Post<T>(string url, RequestObject obj)
