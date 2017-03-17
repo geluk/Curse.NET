@@ -1,5 +1,5 @@
 # Curse.NET
-Curse.NET is a C#/.NET library for interfacing with the Curse Client API.
+Curse.NET is a C#/.NET library for interfacing with the Twitch Desktop App (formerly called the Curse Client).
 
 This library has been created by reverse engineering the Curse client protocol,
 since Curse does not officially expose an API for developers. Because of this,
