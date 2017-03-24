@@ -1,4 +1,7 @@
-﻿namespace Curse.NET.Model
+﻿using System;
+using Newtonsoft.Json;
+
+namespace Curse.NET.Model
 {
 	public class CreateInviteResponse
 	{
@@ -9,8 +12,10 @@
 		public Group Group { get; set; }
 		public string ChannelID { get; set; }
 		public Channel Channel { get; set; }
-		public long DateCreated { get; set; }
-		public long DateExpires { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime DateCreated { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime DateExpires { get; set; }
 		public int MaxUses { get; set; }
 		public int TimesUsed { get; set; }
 		public bool IsRedeemable { get; set; }
