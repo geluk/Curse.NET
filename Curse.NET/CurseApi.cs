@@ -120,9 +120,9 @@ namespace Curse.NET
 			}
 		}
 
-        public string CreateInvite(string serverId, string channelId, int lifespanMinutes = 0, int maxUses = 0, bool autoRemoveMembers = false)
+        public CreateInviteResponse CreateInvite(string serverId, string channelId, int lifespanMinutes = 0, int maxUses = 0, bool autoRemoveMembers = false)
         {
-            string rs = httpApi.Post($"https://groups-v1.curseapp.net/servers/{serverId}/invites", new CreateInviteRequest
+            var rs = httpApi.Post<CreateInviteResponse>($"https://groups-v1.curseapp.net/servers/{serverId}/invites", new CreateInviteRequest
             {
                 ChannelId = channelId,
                 LifespanMinutes = lifespanMinutes,
