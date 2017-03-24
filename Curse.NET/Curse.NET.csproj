@@ -67,6 +67,7 @@
     <Compile Include="Model\ConversationsRequest.cs" />
     <Compile Include="Model\CreateInviteRequest.cs" />
     <Compile Include="Model\CreateInviteResponse.cs" />
+    <Compile Include="Model\ErrorResponse.cs" />
     <Compile Include="Model\GetMessagesResponse.cs" />
     <Compile Include="Model\LoginResponse.cs" />
     <Compile Include="Model\ModelExtensions.cs" />

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Curse.NET.ExtensionMethods;
 using Curse.NET.Model;
+using Newtonsoft.Json;
 
 namespace Curse.NET
 {
@@ -122,16 +124,39 @@ namespace Curse.NET
 
         public CreateInviteResponse CreateInvite(string serverId, string channelId, int lifespanMinutes = 0, int maxUses = 0, bool autoRemoveMembers = false)
         {
-            var rs = httpApi.Post<CreateInviteResponse>($"https://groups-v1.curseapp.net/servers/{serverId}/invites", new CreateInviteRequest
-            {
-                ChannelId = channelId,
-                LifespanMinutes = lifespanMinutes,
-                MaxUses = maxUses,
-                AutoRemoveMembers = autoRemoveMembers,
-                AdminDescription = "",
-                ReadableWordDescription = 1
-            });
-            return rs;
+	        try
+	        {
+		        var rs = httpApi.Post<CreateInviteResponse>($"https://groups-v1.curseapp.net/servers/{serverId}/invites", new CreateInviteRequest
+		        {
+			        ChannelId = channelId,
+			        LifespanMinutes = lifespanMinutes,
+			        MaxUses = maxUses,
+			        AutoRemoveMembers = autoRemoveMembers,
+			        AdminDescription = "",
+			        ReadableWordDescription = 1
+		        });
+		        return rs;
+	        }
+	        catch (WebException e) when ((e.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.BadRequest)
+	        {
+		        using (var rsStream = e.Response.GetResponseStream())
+		        {
+			        if (rsStream == null) throw new InvalidRequestException(e.Message, e);
+
+			        var reader = new StreamReader(rsStream);
+			        var responseText = reader.ReadToEnd();
+			        if (string.IsNullOrEmpty(responseText)) throw new InvalidRequestException(e.Message, e);
+
+			        var error = JsonConvert.DeserializeObject<ErrorResponse>(responseText);
+			        switch (error.ErrorType)
+			        {
+				        case ErrorType.NotAccessibleByGuests:
+					        throw new InvalidRequestException(error.Message, e);
+				        default:
+					        throw new InvalidRequestException(error.Message, e);
+			        }
+		        }
+	        }
         }
 	}
 }
