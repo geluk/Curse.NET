@@ -35,9 +35,8 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SuperSocket.ClientEngine, Version=0.8.0.6, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SuperSocket.ClientEngine.Core.0.8.0.6\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="SuperSocket.ClientEngine, Version=0.8.0.8, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\packages\SuperSocket.ClientEngine.Core.0.8.0.8\lib\net45\SuperSocket.ClientEngine.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -66,6 +65,8 @@
     <Compile Include="MicrosecondEpochConverter.cs" />
     <Compile Include="Model\ContactsResponse.cs" />
     <Compile Include="Model\ConversationsRequest.cs" />
+    <Compile Include="Model\CreateInviteRequest.cs" />
+    <Compile Include="Model\CreateInviteResponse.cs" />
     <Compile Include="Model\GetMessagesResponse.cs" />
     <Compile Include="Model\LoginResponse.cs" />
     <Compile Include="Model\ModelExtensions.cs" />

@@ -119,5 +119,19 @@ namespace Curse.NET
 				throw new NotAuthorisedException("You are not authorised to view the messages for this channel.");
 			}
 		}
+
+        public CreateInviteResponse CreateInvite(string serverId, string channelId, int lifespanMinutes = 0, int maxUses = 0, bool autoRemoveMembers = false)
+        {
+            var rs = httpApi.Post<CreateInviteResponse>($"https://groups-v1.curseapp.net/servers/{serverId}/invites", new CreateInviteRequest
+            {
+                ChannelId = channelId,
+                LifespanMinutes = lifespanMinutes,
+                MaxUses = maxUses,
+                AutoRemoveMembers = autoRemoveMembers,
+                AdminDescription = "",
+                ReadableWordDescription = 1
+            });
+            return rs;
+        }
 	}
 }
