@@ -1,0 +1,20 @@
+﻿namespace Curse.NET.Model
+{
+	public class CreateInviteResponse
+	{
+		public string InviteCode { get; set; }
+		public int CreatorID { get; set; }
+		public string CreatorName { get; set; }
+		public string GroupID { get; set; }
+		public Group Group { get; set; }
+		public string ChannelID { get; set; }
+		public Channel Channel { get; set; }
+		public long DateCreated { get; set; }
+		public long DateExpires { get; set; }
+		public int MaxUses { get; set; }
+		public int TimesUsed { get; set; }
+		public bool IsRedeemable { get; set; }
+		public string InviteUrl { get; set; }
+		public string AdminDescription { get; set; }
+	}
+}
