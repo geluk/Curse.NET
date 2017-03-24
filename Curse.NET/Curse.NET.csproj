@@ -66,6 +66,7 @@
     <Compile Include="MicrosecondEpochConverter.cs" />
     <Compile Include="Model\ContactsResponse.cs" />
     <Compile Include="Model\ConversationsRequest.cs" />
+    <Compile Include="Model\CreateInviteRequest.cs" />
     <Compile Include="Model\GetMessagesResponse.cs" />
     <Compile Include="Model\LoginResponse.cs" />
     <Compile Include="Model\ModelExtensions.cs" />

@@ -201,6 +201,11 @@ namespace Curse.NET
 		{
 			return CurseApi.FindMembers(group.GroupID, query);
 		}
+
+        public string CreateInvite(Channel channel, int lifespanMinutes, int maxUses, bool autoRemoveMembers = false)
+        {
+            return CurseApi.CreateInvite(channel.RootGroupID, channel.GroupID, lifespanMinutes, maxUses, autoRemoveMembers);
+        }
 		#endregion
 
 		public void Dispose()
