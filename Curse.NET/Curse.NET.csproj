@@ -62,7 +62,7 @@
     <Compile Include="Exceptions.cs" />
     <Compile Include="ExtensionMethods\DateTimeExtensions.cs" />
     <Compile Include="ExtensionMethods\WebSocketExtensions.cs" />
-    <Compile Include="MicrosecondEpochConverter.cs" />
+    <Compile Include="CurseApiConverters.cs" />
     <Compile Include="Model\ContactsResponse.cs" />
     <Compile Include="Model\ConversationsRequest.cs" />
     <Compile Include="Model\CreateInviteRequest.cs" />

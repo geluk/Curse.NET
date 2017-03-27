@@ -30,7 +30,7 @@ namespace Curse.NET.SocketModel
 		public DateTime DateRead { get; set; }
 		public int UnreadCount { get; set; }
 		public int MutualFriendCount { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime OtherUserConnectionStatusTimestamp { get; set; }
 		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime RequestedTimestamp { get; set; }

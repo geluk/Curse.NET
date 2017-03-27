@@ -59,7 +59,7 @@ namespace Curse.NET.SocketModel
 		public bool IsStreaming { get; set; }
 		public object LinkedCommunities { get; set; }
 		public int AfkTimerMins { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime AvatarTimestamp { get; set; }
 		public bool FlaggedAsInappropriate { get; set; }
 		public int MembersOnline { get; set; }
@@ -88,20 +88,20 @@ namespace Curse.NET.SocketModel
 		public object Nickname { get; set; }
 		public int BestRole { get; set; }
 		public int[] Roles { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DateJoined { get; set; }
 		public int ConnectionStatus { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DateLastSeen { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DateLastActive { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DateRemoved { get; set; }
 		public bool IsActive { get; set; }
 		public int CurrentGameID { get; set; }
 		public bool IsVoiceMuted { get; set; }
 		public bool IsVoiceDeafened { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime AvatarTimestamp { get; set; }
 		public object ExternalAccounts { get; set; }
 		public bool IsVerified { get; set; }
