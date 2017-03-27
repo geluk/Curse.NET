@@ -202,10 +202,12 @@ namespace Curse.NET
 			return CurseApi.FindMembers(group.GroupID, query);
 		}
 
-        public CreateInviteResponse CreateInvite(Channel channel, TimeSpan lifespan, int maxUses, bool autoRemoveMembers = false)
-        {
-            return CurseApi.CreateInvite(channel.RootGroupID, channel.GroupID, (int)Math.Round(lifespan.TotalMinutes), maxUses, autoRemoveMembers);
-        }
+		public CreateInviteResponse CreateInvite(Channel channel, TimeSpan? lifespan = null, int maxUses = 0, bool autoRemoveMembers = false)
+		{
+			// Ideally the default value for lifespan should be TimeSpan.Zero, but it must be a compile-time constant.
+			if(lifespan == null) lifespan = TimeSpan.Zero;
+			return CurseApi.CreateInvite(channel.RootGroupID, channel.GroupID, (int)Math.Round(lifespan.Value.TotalMinutes), maxUses, autoRemoveMembers);
+		}
 		#endregion
 
 		public void Dispose()

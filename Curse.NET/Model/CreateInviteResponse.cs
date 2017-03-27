@@ -16,6 +16,7 @@ namespace Curse.NET.Model
 		public DateTime DateCreated { get; set; }
 		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DateExpires { get; set; }
+		[JsonConverter(typeof(NullableIntConverter))]
 		public int MaxUses { get; set; }
 		public int TimesUsed { get; set; }
 		public bool IsRedeemable { get; set; }

@@ -76,7 +76,8 @@ namespace Curse.NET
 
 		public T Post<T>(string url, RequestObject obj)
 		{
-			return JsonConvert.DeserializeObject<T>(Post(url, obj));
+			var response = Post(url, obj);
+			return JsonConvert.DeserializeObject<T>(response);
 		}
 
 		public T Get<T>(string url)
