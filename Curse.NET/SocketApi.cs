@@ -37,6 +37,7 @@ namespace Curse.NET
 		public event Action<ChannelStatusChangedResponse> ChannelStatusChanged;
 		public event Action<SocketLoginResponse> LoginReceived;
 		public event Action<ClientPreferencesResponse> ClientPreferencesReceived;
+		public event Action<MessageStatusResponse> MessageStatusReceived;
 
 		public event Action SocketClosed;
 
@@ -192,7 +193,8 @@ namespace Curse.NET
 				case ResponseType.ChannelStatusChanged:
 					ChannelStatusChanged?.Invoke((ChannelStatusChangedResponse)message.Body);
 					break;
-				case ResponseType.Unknown1:
+				case ResponseType.MessageStatus:
+					MessageStatusReceived?.Invoke((MessageStatusResponse)message.Body);
 					break;
 				case ResponseType.FriendshipStatus:
 					FriendshipStatusChanged?.Invoke((FriendshipStatusResponse)message.Body);
