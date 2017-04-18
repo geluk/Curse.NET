@@ -15,7 +15,7 @@ namespace Curse.NET
 
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
-			if (reader.Value == null)
+			if (reader.Value == null || (long) reader.Value == 0)
 			{
 				return DateTime.MinValue;
 			}
@@ -23,6 +23,9 @@ namespace Curse.NET
 		}
 	}
 
+	/// <summary>
+	/// Converter for JSON integer properties that are set to null when they should've been set to zero.
+	/// </summary>
 	internal class NullableIntConverter : DateTimeConverterBase
 	{
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
