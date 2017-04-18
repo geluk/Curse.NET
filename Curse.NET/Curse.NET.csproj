@@ -83,6 +83,7 @@
     <Compile Include="SocketModel\FriendRemovedResponse.cs" />
     <Compile Include="SocketModel\FriendshipStatusResponse.cs" />
     <Compile Include="SocketModel\LoginRequest.cs" />
+    <Compile Include="SocketModel\MessageStatusResponse.cs" />
     <Compile Include="SocketModel\PingRequest.cs" />
     <Compile Include="SocketModel\PingResponse.cs" />
     <Compile Include="Enums.cs" />
