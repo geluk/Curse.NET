@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Curse.NET.Model;
 using Curse.NET.SocketModel;
 
@@ -15,12 +16,13 @@ namespace Curse.NET
 		private Timer loginRenwalTimer;
 
 		public event Action<Group, Channel, MessageResponse> MessageReceived;
-		public event Action<Group, UserResponse, MessageResponse> PrivateMessageReceived;
+		public event Action<ContactResponse, MessageResponse> PrivateMessageReceived;
 		public event Action WebsocketReconnected;
 		public event Action ConnectionLost;
 
 		public CurseApi CurseApi { get; } = new CurseApi();
 		public bool AutoReconnect { get; set; } = true;
+		public TimeSpan WaitTimeout { get; set; } = new TimeSpan(0, 0, 0, 10);
 
 		public IReadOnlyList<Group> Groups { get; private set; }
 		public IReadOnlyList<Friend> Friends { get; private set; }
@@ -58,6 +60,7 @@ namespace Curse.NET
 		private void LoadContacts()
 		{
 			var contacts = CurseApi.LoadContacts();
+
 			Groups = contacts.Groups;
 			Friends = contacts.Friends;
 
@@ -143,9 +146,14 @@ namespace Curse.NET
 			}
 			else
 			{
-				var group = GroupMap[message.RootConversationID];
-				var otherUser = CurseApi.GetMember(group.GroupID, int.Parse(split.Skip(1).First(id => id != login.Session.UserID.ToString())));
-				PrivateMessageReceived?.Invoke(group, otherUser, message);
+				if (message.RootConversationID != null)
+				{
+					// API seems to have changed, private messages should no longer be associated with a group.
+					throw new InvalidOperationException("Expected groupID to be empty.");
+				}
+				var otherUserId = split.Select(int.Parse).First(uid => uid != Self.UserID);
+				var otherUser = CurseApi.GetContact(otherUserId);
+				PrivateMessageReceived?.Invoke(otherUser, message);
 			}
 		}
 
@@ -187,14 +195,60 @@ namespace Curse.NET
 			CurseApi.DeleteMessage(message.ConversationID, message.ServerID, message.Timestamp);
 		}
 
-		public void SendMessage(Channel clientChannel, string message)
+		public async Task<MessageStatusResponse> SendMessageAsync(Channel clientChannel, string message)
 		{
+			var ev = new ManualResetEventSlim();
+			MessageStatusResponse status = null;
+			var handler = new Action<MessageStatusResponse>(rs =>
+			{
+				if (clientChannel.GroupID == rs.ConversationID)
+				{
+					status = rs;
+					ev.Set();
+				}
+			});
+
+			socketApi.MessageStatusReceived += handler;
 			CurseApi.SendMessage(clientChannel.GroupID, message);
+			var result = await Task.Run(() => ev.Wait(WaitTimeout));
+			socketApi.MessageStatusReceived -= handler;
+
+			if (!result)
+			{
+				throw new CurseDotNetException("Message may not have been delivered. A timeout occurred while awaiting a message status response.");
+			}
+			return status;
 		}
 
-		public void SendMessage(Group group, UserResponse user, string message)
+		public async Task<MessageStatusResponse> SendMessageAsync(UserResponse user, string message)
 		{
-			CurseApi.SendMessage(group.GroupID, user.UserID, message);
+			var ev = new ManualResetEventSlim();
+			MessageStatusResponse status = null;
+			var handler = new Action<MessageStatusResponse>(rs =>
+			{
+				var split = rs.ConversationID.Split(':');
+				var otherUserId = split.Where(part => part.All(char.IsDigit)).Select(int.Parse).FirstOrDefault(id => id != Self.UserID);
+
+				if (otherUserId == user.UserID)
+				{
+					status = rs;
+					ev.Set();
+				}
+			});
+
+			socketApi.MessageStatusReceived += handler;
+			CurseApi.SendMessage(user.UserID, message);
+			var result = await Task.Run(() => ev.Wait(WaitTimeout));
+			socketApi.MessageStatusReceived -= handler;
+			if (!result)
+			{
+				throw new CurseDotNetException("Message may not have been delivered. A timeout occurred while awaiting a message status response.");
+			}
+			if (message == "test")
+			{
+				throw new Exception("test");
+			}
+			return status;
 		}
 
 		public UserResponse[] FindMembers(Group group, string query)

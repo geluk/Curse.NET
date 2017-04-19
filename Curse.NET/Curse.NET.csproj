@@ -63,6 +63,7 @@
     <Compile Include="ExtensionMethods\DateTimeExtensions.cs" />
     <Compile Include="ExtensionMethods\WebSocketExtensions.cs" />
     <Compile Include="CurseApiConverters.cs" />
+    <Compile Include="Model\ContactResponse.cs" />
     <Compile Include="Model\ContactsResponse.cs" />
     <Compile Include="Model\ConversationsRequest.cs" />
     <Compile Include="Model\CreateInviteRequest.cs" />

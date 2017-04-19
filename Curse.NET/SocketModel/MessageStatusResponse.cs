@@ -15,11 +15,14 @@ namespace Curse.NET.SocketModel
 		public object RetryAfter { get; set; }
 		public int ForbiddenReason { get; set; }
 		public int MissingPermission { get; set; }
+
+		public bool OK => Status == MessageStatus.Accepted;
 	}
 
 	public enum MessageStatus
 	{
 		MessageRefused = 2,
 		Accepted = 4,
+		UnknownError = 5,
 	}
 }

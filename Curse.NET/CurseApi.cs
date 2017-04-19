@@ -33,9 +33,9 @@ namespace Curse.NET
 			httpApi.AuthToken = authToken;
 		}
 
-		public void SendMessage(string groupId, int userId, string message)
+		public void SendMessage(int userId, string message)
 		{
-			httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{groupId}:{userId}:{Session.User.UserID}", new SendMessageRequest
+			httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{userId}:{Session.User.UserID}", new SendMessageRequest
 			{
 				Body = message,
 				// TODO: Verify that SessionID should be used here
@@ -91,6 +91,17 @@ namespace Curse.NET
 		public ContactsResponse LoadContacts()
 		{
 			return httpApi.Get<ContactsResponse>("https://contacts-v1.curseapp.net/contacts");
+		}
+
+		public ContactResponse GetContact(int userId)
+		{
+			return httpApi.Get<ContactResponse>($"https://contacts-v1.curseapp.net/users/{userId}");
+		}
+
+		public string FriendSync()
+		{
+			// TODO: Parse this into a model
+			return httpApi.Get("https://contacts-v1.curseapp.net/friend-sync");
 		}
 
 		public void DeleteMessage(string conversationId, string serverId, DateTime timestamp)
