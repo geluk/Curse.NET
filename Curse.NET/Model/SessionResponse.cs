@@ -1,4 +1,6 @@
 ﻿using System;
+using System.CodeDom;
+using Newtonsoft.Json;
 
 namespace Curse.NET.Model
 {
@@ -28,6 +30,7 @@ namespace Curse.NET.Model
 		public int FriendMessagePushPreference { get; set; }
 		public bool FriendRequestPushEnabled { get; set; }
 		public object MentionsPushEnabled { get; set; }
-		public long AvatarTimestamp { get; set; }
+		[JsonConverter(typeof(MillisecondEpochConverter))]
+		public DateTime AvatarTimestamp { get; set; }
 	}
 }

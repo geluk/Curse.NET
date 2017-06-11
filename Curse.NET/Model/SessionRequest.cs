@@ -5,7 +5,7 @@ namespace Curse.NET.Model
 	public class SessionRequest : RequestObject
 	{
 		public string MachineKey { get; private set; }
-		public int Platform { get; private set; }
+		public DevicePlatform Platform { get; private set; }
 		public string DeviceID { get; private set; }
 		public string PushKitToken { get; private set; }
 
@@ -14,7 +14,7 @@ namespace Curse.NET.Model
 			return new SessionRequest
 			{
 				MachineKey = Guid.NewGuid().ToString(),
-				Platform = 6,
+				Platform = DevicePlatform.Chrome,
 			};
 		}
 	}

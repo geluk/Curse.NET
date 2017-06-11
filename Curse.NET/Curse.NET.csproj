@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SuperSocket.ClientEngine, Version=0.8.0.12, Culture=neutral, PublicKeyToken=ee9af13f57f00acc, processorArchitecture=MSIL">
@@ -48,7 +48,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="websocket-sharp, Version=1.0.2.59611, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
+      <HintPath>..\packages\WebSocketSharp.1.0.3-rc11\lib\websocket-sharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="WebSocket4Net, Version=0.15.0.9, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
@@ -57,15 +57,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientEvents.cs" />
     <Compile Include="CurseApi.cs" />
+    <Compile Include="HttpApi.cs" />
     <Compile Include="CurseClient.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="ExtensionMethods\DateTimeExtensions.cs" />
     <Compile Include="ExtensionMethods\WebSocketExtensions.cs" />
-    <Compile Include="MicrosecondEpochConverter.cs" />
-    <Compile Include="Model\ContactsRequest.cs" />
+    <Compile Include="CurseApiConverters.cs" />
+    <Compile Include="Model\ContactResponse.cs" />
+    <Compile Include="Model\ContactsResponse.cs" />
     <Compile Include="Model\ConversationsRequest.cs" />
+    <Compile Include="Model\CreateInviteRequest.cs" />
+    <Compile Include="Model\CreateInviteResponse.cs" />
+    <Compile Include="Model\ErrorResponse.cs" />
     <Compile Include="Model\GetMessagesResponse.cs" />
     <Compile Include="Model\LoginResponse.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
@@ -81,9 +85,10 @@
     <Compile Include="SocketModel\FriendRemovedResponse.cs" />
     <Compile Include="SocketModel\FriendshipStatusResponse.cs" />
     <Compile Include="SocketModel\LoginRequest.cs" />
+    <Compile Include="SocketModel\MessageStatusResponse.cs" />
     <Compile Include="SocketModel\PingRequest.cs" />
     <Compile Include="SocketModel\PingResponse.cs" />
-    <Compile Include="SocketModel\RegionId.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="SocketModel\ClientPreferencesResponse.cs" />
     <Compile Include="SocketModel\SocketLoginResponse.cs" />
     <Compile Include="SocketModel\MessageResponse.cs" />

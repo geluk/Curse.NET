@@ -1,5 +1,5 @@
 # Curse.NET
-A C#/.NET Curse Client API
+Curse.NET is a C#/.NET library for interfacing with the Twitch Desktop App (formerly called the Curse Client).
 
 This library has been created by reverse engineering the Curse client protocol,
 since Curse does not officially expose an API for developers. Because of this,
@@ -11,7 +11,7 @@ Install the NuGet package to your project.
 ```
 Install-Package Curse.NET
 ```
-Alternatively, clone the project, build the DLL, and reference it.
+Alternatively (in case you need the latest version), clone the project, build the DLL, and reference it.
 
 ## Usage
 
@@ -24,3 +24,9 @@ client.OnMessageReceived += (server, channel, message) => {
 client.Connect("username", "password");
 
 ```
+## Development
+
+The library is still in active development, so its public API can and will change between commits.
+
+Features will mostly be added on an as-needed basis.
+If you require a specific feature that isn't yet implemented, feel free to create an issue for it.

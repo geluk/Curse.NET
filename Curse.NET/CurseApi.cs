@@ -1,100 +1,173 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using Curse.NET.ExtensionMethods;
 using Curse.NET.Model;
 using Newtonsoft.Json;
 
 namespace Curse.NET
 {
-	internal class CurseApi
+	public class CurseApi
 	{
-		public string AuthToken { get; set; }
+		private readonly HttpApi httpApi = new HttpApi();
+		public SessionResponse Session { get; private set; }
 
-
-		public T Post<T>(string url, string payload)
+		public LoginResponse Login(string username, string password)
 		{
-			var rq = WebRequest.CreateHttp(url);
-			rq.Method = "POST";
-			rq.ContentType = "application/x-www-form-urlencoded";
-			rq.CookieContainer = new CookieContainer();
-			using (var writer = new StreamWriter(rq.GetRequestStream()))
+			username = WebUtility.UrlEncode(username);
+			password = WebUtility.UrlEncode(password);
+			return httpApi.Post<LoginResponse>("https://logins-v1.curseapp.net/login", $"username={username}&password={password}");
+		}
+
+		public void CreateSession()
+		{
+			Session = httpApi.Post<SessionResponse>("https://sessions-v1.curseapp.net/sessions", SessionRequest.Create());
+		}
+
+		public void SetAuthToken(string authToken)
+		{
+			httpApi.AuthToken = authToken;
+		}
+
+		public void SendMessage(int userId, string message)
+		{
+			httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{userId}:{Session.User.UserID}", new SendMessageRequest
 			{
-				writer.Write(payload);
-			}
-			var response = rq.GetResponse();
-			using (var reader = new StreamReader(response.GetResponseStream()))
+				Body = message,
+				// TODO: Verify that SessionID should be used here
+				ClientID = Session.SessionID,
+				MachineKey = Session.MachineKey
+			});
+		}
+
+		public void SendMessage(string channelId, string message)
+		{
+			httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{channelId}", new SendMessageRequest
 			{
-				return JsonConvert.DeserializeObject<T>(reader.ReadToEnd());
-			}
+				Body = message,
+				// TODO: Verify that SessionID should be used here
+				ClientID = Session.SessionID,
+				MachineKey = Session.MachineKey
+			});
 		}
 
-
-		public string Post(string url, RequestObject obj)
+		public Message[] FindMessages(string  groupId, DateTime start, DateTime end, int pageSize)
 		{
-			var rq = WebRequest.CreateHttp(url);
-			rq.Method = "POST";
-			rq.ContentType = "application/json";
-			rq.Headers["AuthenticationToken"] = AuthToken;
-			using (var writer = new StreamWriter(rq.GetRequestStream()))
+			return httpApi.Get<Message[]>($"https://conversations-v1.curseapp.net/conversations/{groupId}" +
+					$"?startTimestamp={start.ToTimestamp()}" +
+					$"&endTimestamp={end.ToTimestamp()}" +
+					$"&pageSize={pageSize}");
+		}
+
+		public UserResponse[] GetMembers(string groupId, bool actives, int pageNumber, int pageSize)
+		{
+			return httpApi.Get<UserResponse[]>($"https://groups-v1.curseapp.net/groups/{groupId}/members?actives={actives}&page={pageNumber}&pageSize={pageSize}");
+		}
+
+		public UserResponse GetMember(string groupId, int userId)
+		{
+			return httpApi.Get<UserResponse>($"https://groups-v1.curseapp.net/groups/{groupId}/members/{userId}");
+		}
+
+		public void KickUser(string groupId, int userId)
+		{
+			httpApi.Delete($"https://groups-v1/curseapp.net/groups/{groupId}/members/{userId}");
+		}
+
+		public void BanUser(string serverId, int userId)
+		{
+			httpApi.Post($"https://groups-v1/curseapp.net/servers/{serverId}/bans/{userId}");
+		}
+
+		public UserResponse[] FindMembers(string groupId, string name)
+		{
+			return httpApi.Get<UserResponse[]>($"https://groups-v1.curseapp.net/groups/{groupId}/members/simple-search?query={name}");
+		}
+
+		public ContactsResponse LoadContacts()
+		{
+			return httpApi.Get<ContactsResponse>("https://contacts-v1.curseapp.net/contacts");
+		}
+
+		public ContactResponse GetContact(int userId)
+		{
+			return httpApi.Get<ContactResponse>($"https://contacts-v1.curseapp.net/users/{userId}");
+		}
+
+		public string FriendSync()
+		{
+			// TODO: Parse this into a model
+			return httpApi.Get("https://contacts-v1.curseapp.net/friend-sync");
+		}
+
+		public void DeleteMessage(string conversationId, string serverId, DateTime timestamp)
+		{
+			try
 			{
-				var text = JsonConvert.SerializeObject(obj);
-				writer.Write(text);
+				httpApi.Delete($"https://conversations-v1.curseapp.net/conversations/{conversationId}/{serverId}-{timestamp.ToTimestamp()}");
 			}
-			var response = rq.GetResponse();
-			using (var reader = new StreamReader(response.GetResponseStream()))
+			catch (WebException e) when ((e.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.NotFound)
 			{
-				return reader.ReadToEnd();
+				throw new NotAuthorisedException("You are not authorised to delete this message.");
 			}
 		}
 
-		public T Post<T>(string url, RequestObject obj)
+		public Message[] GetMessages(string channelId, DateTime start, DateTime end, int pageSize)
 		{
-			return JsonConvert.DeserializeObject<T>(Post(url, obj));
-		}
+			// TODO: check max page size
+			var startTs = start == DateTime.MinValue ? 0 : start.ToTimestamp();
+			var endTs = end == DateTime.MaxValue ? 0 : end.ToTimestamp();
 
-		public T Get<T>(string url)
-		{
-			return JsonConvert.DeserializeObject<T>(Get(url));
-		}
-
-		public string Get(string url)
-		{
-			var rq = WebRequest.CreateHttp(url);
-			rq.Method = "GET";
-			rq.ContentType = "application/json";
-			rq.Headers["AuthenticationToken"] = AuthToken;
-			var response = rq.GetResponse();
-			using (var reader = new StreamReader(response.GetResponseStream()))
+			try
 			{
-				var responseText = reader.ReadToEnd();
-				return responseText;
+				var rs = httpApi.Get<Message[]>($"https://conversations-v1.curseapp.net/conversations/{channelId}?startTimestamp={startTs}&endTimestamp={endTs}&pageSize={pageSize}");
+				return rs;
 			}
-		}
-
-		public void Delete(string url)
-		{
-			var rq = WebRequest.CreateHttp(url);
-			rq.Method = "DELETE";
-			rq.Headers["AuthenticationToken"] = AuthToken;
-			var response = rq.GetResponse();
-			using (var reader = new StreamReader(response.GetResponseStream()))
+			catch (WebException e) when((e.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.Forbidden)
 			{
-				var responseText = reader.ReadToEnd();
-				;
-				//return responseText;
+				throw new NotAuthorisedException("You are not authorised to view the messages for this channel.");
 			}
 		}
-	}
 
+        public CreateInviteResponse CreateInvite(string serverId, string channelId, int lifespanMinutes = 0, int maxUses = 0, bool autoRemoveMembers = false)
+        {
+	        try
+	        {
+		        var rs = httpApi.Post<CreateInviteResponse>($"https://groups-v1.curseapp.net/servers/{serverId}/invites", new CreateInviteRequest
+		        {
+			        ChannelId = channelId,
+			        LifespanMinutes = lifespanMinutes,
+			        MaxUses = maxUses,
+			        AutoRemoveMembers = autoRemoveMembers,
+			        AdminDescription = "",
+			        ReadableWordDescription = 1
+		        });
+		        return rs;
+	        }
+	        catch (WebException e) when ((e.Response as HttpWebResponse)?.StatusCode == HttpStatusCode.BadRequest)
+	        {
+		        using (var rsStream = e.Response.GetResponseStream())
+		        {
+			        if (rsStream == null) throw new InvalidRequestException(e.Message, e);
 
-	internal class HttpResponseObject
-	{
-		public HttpResponseObject(string responseText, HttpWebResponse response)
-		{
-			ResponseText = responseText;
-			Response = response;
-		}
+			        var reader = new StreamReader(rsStream);
+			        var responseText = reader.ReadToEnd();
+			        if (string.IsNullOrEmpty(responseText)) throw new InvalidRequestException(e.Message, e);
 
-		public HttpWebResponse Response { get; }
-		public string ResponseText { get; }
+			        var error = JsonConvert.DeserializeObject<ErrorResponse>(responseText);
+			        switch (error.ErrorType)
+			        {
+				        case ErrorType.NotAccessibleByGuests:
+					        throw new InvalidRequestException(error.Message, e);
+				        default:
+					        throw new InvalidRequestException(error.Message, e);
+			        }
+		        }
+	        }
+        }
 	}
 }

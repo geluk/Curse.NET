@@ -25,7 +25,7 @@ namespace Curse.NET.SocketModel
 		public int RecipientID { get; set; }
 		public string Body { get; set; }
 		public bool IsDeleted { get; set; }
-		[JsonConverter(typeof(MicrosecondEpochConverter))]
+		[JsonConverter(typeof(MillisecondEpochConverter))]
 		public DateTime DeletedTimestamp { get; set; }
 		public int DeletedUserID { get; set; }
 		public object DeletedUsername { get; set; }

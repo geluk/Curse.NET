@@ -29,8 +29,8 @@ namespace Curse.NET.SocketModel
 				case ResponseType.ChannelMarkedRead:
 					obj.Body = JsonConvert.DeserializeObject<ChannelMarkedReadResponse>(body);
 					break;
-				case ResponseType.Unknown1:
-					// Sent when a message is posted to a channel
+				case ResponseType.MessageStatus:
+					obj.Body = JsonConvert.DeserializeObject<MessageStatusResponse>(body);
 					break;
 				case ResponseType.ClientPreferences:
 					obj.Body = JsonConvert.DeserializeObject<ClientPreferencesResponse>(body);
