@@ -169,5 +169,15 @@ namespace Curse.NET
 		        }
 	        }
         }
-	}
+
+        public void LikeMessage(string conversationId, string serverId, DateTime timestamp)
+        {
+            httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{conversationId}/{serverId}-{timestamp.ToTimestamp()}/like");
+        }
+
+        public void UnlikeMessage(string conversationId, string serverId, DateTime timestamp)
+        {
+            httpApi.Post($"https://conversations-v1.curseapp.net/conversations/{conversationId}/{serverId}-{timestamp.ToTimestamp()}/unlike");
+        }
+    }
 }

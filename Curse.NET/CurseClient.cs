@@ -265,6 +265,16 @@ namespace Curse.NET
 		{
 			return CurseApi.CreateInvite(channel.RootGroupID, channel.GroupID, 0, maxUses, autoRemoveMembers);
 		}
+
+        public void LikeMessage(MessageResponse message)
+        {
+            CurseApi.LikeMessage(message.ConversationID, message.ServerID, message.Timestamp);
+        }
+
+        public void UnlikeMessage(MessageResponse message)
+        {
+            CurseApi.UnlikeMessage(message.ConversationID, message.ServerID, message.Timestamp);
+        }
 		#endregion
 
 		public void Dispose()
